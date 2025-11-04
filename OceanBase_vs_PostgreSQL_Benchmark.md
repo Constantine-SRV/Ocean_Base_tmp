@@ -42,30 +42,7 @@
 
 ---
 
-## 🩺 Why the Hang Occurred
-Query:
-```sql
-SELECT COUNT(*) FROM taxi_trips1 WHERE rate_code_id = 1 AND pu_location_id = 199;
-```
-- `rate_code_id=1` → ~219 million rows (very non-selective)
-- `pu_location_id=199` → 52 rows (highly selective)
 
-OceanBase started bitmap intersection from the large index instead of the small one. PostgreSQL chose nested-loop via selective index.
-
-**Solution options:**
-```sql
--- Create composite index
-CREATE INDEX idx_taxi_trips1_pu_rate ON taxi_trips1(pu_location_id, rate_code_id);
-ANALYZE TABLE taxi_trips1;
-
--- or use hint to force index order
-SELECT /*+ INDEX(taxi_trips1 idx_taxi_trips1_pu_location_id) */
-       COUNT(*)
-FROM taxi_trips1
-WHERE rate_code_id = 1 AND pu_location_id = 199;
-```
-
----
 
 ## 📜 Unified Query List
 Use these for consistent cross-DB benchmarking (PostgreSQL, OceanBase, MySQL, MSSQL, MongoDB):
