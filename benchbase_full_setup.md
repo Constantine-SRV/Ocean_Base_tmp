@@ -144,7 +144,7 @@ java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/postgres/pg_tpcc_10w.xml 
 ```bash
 mkdir -p ~/benchbase-configs/postgres
 cd ~/benchbase-configs/postgres
-cp ~/benchbase-mysql/config/postgres/sample_chbenchmark_config.xml ~/benchbase-configs/postgres/pg_ch_10w.xml
+cp ~/benchbase-mysql/config/postgres/sample_tpcc_config.xml ~/benchbase-configs/postgres/pg_ch_10w.xml
 nano ~/benchbase-configs/postgres/pg_ch_10w.xml
 java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w.xml --create=true --load=true
 ```
@@ -163,14 +163,16 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w
 ```bash
 ls -lh ~/benchbase-configs/oceanbase/
 cd ~/benchbase-mysql
-java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml --create=true --load=true
+cp ~/benchbase-mysql/config/mysql/sample_tpcc_config.xml ~/benchbase-configs/oceanbase/ob_tpcc_10w.xml
+nano ~/benchbase-configs/oceanbase/ob_tpcc_10w.xml
+java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/oceanbase/ob_tpcc_10w.xml --create=true --load=true
 ```
 
 
 ### Тест CH-Benchmark
 ```bash
-cp ~/benchbase-mysql/config/mysql/sample_chbenchmark_config.xml ~/benchbase-configs/oceanbase/ob_ch_100w.xml
-nano ~/benchbase-configs/oceanbase/ob_ch_100w.xml
+cp ~/benchbase-mysql/config/mysql/sample_chbenchmark_config.xml ~/benchbase-configs/oceanbase/ob_ch_10w.xml
+nano ~/benchbase-configs/oceanbase/ob_ch_10w.xml
 ```
 
 ```bash
