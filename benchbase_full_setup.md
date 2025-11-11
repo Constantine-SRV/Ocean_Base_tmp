@@ -1,127 +1,131 @@
-# 📘 Настройка конфигурации BenchBase
+```text
+тестирование через benchbase
 
-## Создание каталогов для конфигураций
+установка необходима  <java.version>23</java.version>
+https://adoptium.net/temurin/releases/
+скачиваем  OpenJDK23U-jdk_x64_linux_hotspot_23.0.2_7.tar.gz в домашний каталог
+можно так если файл есть
+cd ~
+wget https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.2%2B7/OpenJDK23U-jdk_x64_linux_hotspot_23.0.2_7.tar.gz
+# Создаем директорию для JVM
+sudo mkdir -p /usr/lib/jvm
 
-``` bash
+# Распаковываем Java 23
+sudo tar xzf ~/OpenJDK23U-jdk_x64_linux_hotspot_23.0.2_7.tar.gz -C /usr/lib/jvm/
+
+# Проверяем имя папки
+ls /usr/lib/jvm/
+
+# Настраиваем alternatives для java
+sudo alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-23.0.2+7/bin/java 2
+
+# Настраиваем alternatives для javac
+sudo alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk-23.0.2+7/bin/javac 2
+
+# Переключаемся на Java 23
+sudo alternatives --config java
+# Выбери номер с /usr/lib/jvm/jdk-23.0.2+7
+
+sudo alternatives --config javac
+# Выбери номер с /usr/lib/jvm/jdk-23.0.2+7
+
+# Проверяем версии
+java -version
+javac -version
+
+
+
+установка
+sudo dnf install -y git
+
+# =======================================
+# 🧹 1. Очистка старых установок
+# =======================================
+cd ~
+rm -rf benchbase benchbase-* benchbase-pg benchbase-mysql \
+       benchbase-postgres benchbase-postgres-src \
+       benchbase-mysql benchbase-mysql-src
+
+# =======================================
+# 🐘 2. Установка BenchBase для PostgreSQL
+# =======================================
+git clone https://github.com/cmu-db/benchbase.git benchbase-postgres-src
+cd benchbase-postgres-src
+./mvnw clean package -P postgres -DskipTests
+
+# Распаковка готовой сборки в домашний каталог
+tar -xzf target/benchbase-postgres.tgz -C ~/
+
+# =======================================
+# 🐬 3. Установка BenchBase для MySQL
+# =======================================
+cd ~
+git clone https://github.com/cmu-db/benchbase.git benchbase-mysql-src
+cd benchbase-mysql-src
+./mvnw clean package -P mysql -DskipTests
+
+# Распаковка готовой сборки в домашний каталог
+tar -xzf target/benchbase-mysql.tgz -C ~/
+
+После установки структура будет такой:
+~/benchbase-postgres-src/   ← исходники (можно удалить)
+~/benchbase-mysql-src/      ← исходники (можно удалить)
+~/benchbase-postgres/       ← готовая сборка PostgreSQL
+~/benchbase-mysql/          ← готовая сборка MySQL
+
+Где лежат шаблоны конфигураций:
+~/benchbase-postgres/config/postgres/
+~/benchbase-mysql/config/mysql/
+
 mkdir -p ~/benchbase-configs/postgres
 mkdir -p ~/benchbase-configs/mysql
-mkdir -p ~/benchbase-configs/oceanbase
-```
 
-------------------------------------------------------------------------
 
-## 🐘 PostgreSQL
 
-### Копируем шаблон и создаём конфиг:
 
-``` bash
+вначале создать конфиги 
+параметры постгреса 
+    <url>jdbc:postgresql://192.168.55.211:5432/testdb?sslmode=disable&amp;ApplicationName=chbenchmark&amp;reWriteBatchedInserts=true</url>
+    <username>testdbuser</username>
+    <password>qaz123</password>
+
+все делаем в 
+cd ~
 cd ~/benchbase-configs/postgres
 cp ~/benchbase-postgres/config/postgres/sample_tpcc_config.xml pg_tpcc_10w.xml
 nano pg_tpcc_10w.xml
-```
 
-### Пример настроек подключения:
 
-``` xml
-<url>jdbc:postgresql://192.168.55.211:5432/testdb?sslmode=disable&amp;ApplicationName=chbenchmark&amp;reWriteBatchedInserts=true</url>
-<username>testdbuser</username>
-<password>qaz123</password>
-```
-
-### Создание базы и загрузка данных:
-
-``` bash
+создать базу
 cd ~/benchbase-postgres
 java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/postgres/pg_tpcc_10w.xml --create=true --load=true
-```
 
-------------------------------------------------------------------------
-
-## 🧪 CH-Benchmark для PostgreSQL
-
-``` bash
-cp ~/benchbase-postgres/config/postgres/sample_chbenchmark_config.xml ~/benchbase-configs/postgres/pg_ch_10w.xml
-nano ~/benchbase-configs/postgres/pg_ch_10w.xml
-```
-
-Создание базы:
-
-``` bash
-java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w.xml --create=true --load=true
-```
-
-Запуск теста:
-
-``` bash
-java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w.xml --execute=true
-```
-
-------------------------------------------------------------------------
-
-## 🐬 OceanBase (через MySQL-драйвер)
-
-### Конфигурация для TPC-C
-
-``` bash
+Создание конфига для CH-Benchmark необходимо заранее создать tpcc
+mkdir -p ~/benchbase-configs/oceanbase
 cd ~/benchbase-configs/oceanbase
-cp ~/benchbase-mysql/config/mysql/sample_tpcc_config.xml ob_tpcc_100w.xml
-nano ob_tpcc_100w.xml
-```
+cp ~/benchbase-mysql/config/mysql/sample_tpcc_config.xml ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml
+nano ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml
 
-**Настройки подключения:**
+конфиг ОБ
+    <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;socketTimeout=1800000&amp;connectTimeout=30000</url>
+    <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC</url>
+    <username>root@sys</username>
+    <password>!QAZ2wsx3edc</password>
 
-``` xml
-<url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;socketTimeout=1800000&amp;connectTimeout=30000</url>
-<username>root@sys</username>
-<password>qaz123</password>
-```
-
-**Создание и загрузка базы:**
-
-``` bash
+ls -lh ~/benchbase-configs/oceanbase/
 cd ~/benchbase-mysql
 java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml --create=true --load=true
-```
 
-------------------------------------------------------------------------
 
-## 🧩 CH-Benchmark для OceanBase
-
-``` bash
+Тест CH-Benchmark
 cp ~/benchbase-mysql/config/mysql/sample_chbenchmark_config.xml ~/benchbase-configs/oceanbase/ob_ch_100w.xml
 nano ~/benchbase-configs/oceanbase/ob_ch_100w.xml
-```
+cd ~/benchbase-mysql
+java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_100w.xml --execute=true
 
-**Создание базы:**
-
-``` bash
 cd ~/benchbase-mysql
 java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_100w.xml --create=true --load=true
-```
 
-**Запуск теста:**
-
-``` bash
 java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_100w.xml --execute=true
+
 ```
-
-------------------------------------------------------------------------
-
-## 📂 Структура после установки
-
-    ~/benchbase-postgres-src/      ← исходники (можно удалить)
-    ~/benchbase-mysql-src/         ← исходники (можно удалить)
-    ~/benchbase-postgres/          ← готовая сборка PostgreSQL
-    ~/benchbase-mysql/             ← готовая сборка MySQL/OceanBase
-    ~/benchbase-configs/           ← твои XML-конфиги
-
-------------------------------------------------------------------------
-
-## 💡 Примечания
-
-
--   Для CHBenchmark создаются **дополнительные аналитические таблицы**:
-
-    -   `customer_address`
-    -   `item_market`
-    -   `order_line_details`
