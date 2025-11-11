@@ -146,6 +146,7 @@ mkdir -p ~/benchbase-configs/postgres
 cd ~/benchbase-configs/postgres
 cp ~/benchbase-mysql/config/postgres/sample_chbenchmark_config.xml ~/benchbase-configs/postgres/pg_ch_10w.xml
 nano ~/benchbase-configs/postgres/pg_ch_10w.xml
+java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w.xml --create=true --load=true
 ```
 запуск теста 
 ```bash
