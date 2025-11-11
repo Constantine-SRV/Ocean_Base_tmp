@@ -188,8 +188,8 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_10
 ```bash
  zip -r ~/benchbase_results.zip ~/benchbase-mysql/results/chbenchmark_2025-11-11_19-25-41.{summary.json,results.csv,params.json} ~/benchbase-postgres/results/chbenchmark_2025-11-11_19-32-47.{summary.json,results.csv,params.json}
 ```
-##запросы по размерам таблиц
-###10 складов ПГ
+## Запросы по размерам таблиц
+### 10 складов ПГ
 ```
 testdb=# VACUUM (FREEZE, ANALYZE);
 VACUUM
