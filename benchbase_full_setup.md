@@ -150,9 +150,8 @@ nano ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml
 конфиг ОБ
 ```xml
     <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;socketTimeout=1800000&amp;connectTimeout=30000</url>
-    <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC</url>
     <username>root@sys</username>
-    <password>!QAZ2wsx3edc</password>
+    <password>qaz123</password>
 ```
 
 ```bash
