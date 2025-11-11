@@ -165,8 +165,6 @@ java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/oceanbase/ob_tpcc_100w.xm
 ```bash
 cp ~/benchbase-mysql/config/mysql/sample_chbenchmark_config.xml ~/benchbase-configs/oceanbase/ob_ch_100w.xml
 nano ~/benchbase-configs/oceanbase/ob_ch_100w.xml
-cd ~/benchbase-mysql
-java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_100w.xml --execute=true
 ```
 
 ```bash
