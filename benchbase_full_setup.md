@@ -188,3 +188,60 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_10
 ```bash
  zip -r ~/benchbase_results.zip ~/benchbase-mysql/results/chbenchmark_2025-11-11_19-25-41.{summary.json,results.csv,params.json} ~/benchbase-postgres/results/chbenchmark_2025-11-11_19-32-47.{summary.json,results.csv,params.json}
 ```
+10 складов ПГ
+```
+
+testdb=# SELECT 'customer' AS table_name, COUNT(*) AS row_count FROM customer
+UNION ALL SELECT 'district', COUNT(*) FROM district
+UNION ALL SELECT 'warehouse', COUNT(*) FROM warehouse
+UNION ALL SELECT 'item', COUNT(*) FROM item
+UNION ALL SELECT 'stock', COUNT(*) FROM stock
+UNION ALL SELECT 'orders', COUNT(*) FROM orders
+UNION ALL SELECT 'order_line', COUNT(*) FROM order_line
+UNION ALL SELECT 'new_order', COUNT(*) FROM new_order
+UNION ALL SELECT 'history', COUNT(*) FROM history order by 1;
+ table_name | row_count
+------------+-----------
+ customer   |    300000
+ district   |       100
+ history    |    300000
+ item       |    100000
+ new_order  |     90000
+ order_line |   3000644
+ orders     |   3505504
+ stock      |   1000000
+ warehouse  |        10
+(9 rows)
+
+testdb=# VACUUM (FREEZE, ANALYZE);
+VACUUM
+testdb=#
+
+
+testdb=# SELECT
+  table_name,
+  pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) AS total_size
+FROM information_schema.tables
+WHERE table_schema='public'
+ORDER BY 1;
+ table_name | total_size
+------------+------------
+ customer   | 208 MB
+ district   | 64 kB
+ history    | 25 MB
+ item       | 12 MB
+ nation     | 64 kB
+ new_order  | 6808 kB
+ oorder     | 40 MB
+ order_line | 380 MB
+ orders     | 472 MB
+ region     | 56 kB
+ stock      | 361 MB
+ supplier   | 2496 kB
+ warehouse  | 56 kB
+(13 rows)
+
+testdb=#
+
+
+```
