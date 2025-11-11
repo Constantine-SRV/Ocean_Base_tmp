@@ -177,11 +177,11 @@ nano ~/benchbase-configs/oceanbase/ob_ch_10w.xml
 
 ```bash
 cd ~/benchbase-mysql
-java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_100w.xml --create=true --load=true
+java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_10w.xml --create=true --load=true
 ```
 
 ```bash
-java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_100w.xml --execute=true
+java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_10w.xml --execute=true
 ```
 
 ### Собрать резуьтаты обоих тестов в один zip 2025-11-11_19-25-41 будет виден в выводе тестов
