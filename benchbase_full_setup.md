@@ -118,10 +118,9 @@ mkdir -p ~/benchbase-configs/mysql
 
 
 
-
-```xml
 вначале создать конфиги
 параметры постгреса
+```xml
     <url>jdbc:postgresql://192.168.55.211:5432/testdb?sslmode=disable&amp;ApplicationName=chbenchmark&amp;reWriteBatchedInserts=true</url>
     <username>testdbuser</username>
     <password>qaz123</password>
@@ -135,23 +134,21 @@ cp ~/benchbase-postgres/config/postgres/sample_tpcc_config.xml pg_tpcc_10w.xml
 nano pg_tpcc_10w.xml
 ```
 
-
-```bash
 создать базу
+```bash
 cd ~/benchbase-postgres
 java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/postgres/pg_tpcc_10w.xml --create=true --load=true
 ```
 
-```bash
 Создание конфига для CH-Benchmark необходимо заранее создать tpcc
+```bash
 mkdir -p ~/benchbase-configs/oceanbase
 cd ~/benchbase-configs/oceanbase
 cp ~/benchbase-mysql/config/mysql/sample_tpcc_config.xml ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml
 nano ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml
 ```
-
-```xml
 конфиг ОБ
+```xml
     <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;socketTimeout=1800000&amp;connectTimeout=30000</url>
     <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC</url>
     <username>root@sys</username>
