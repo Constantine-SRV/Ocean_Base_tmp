@@ -190,28 +190,65 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_10
 ```
 10 складов ПГ
 ```
+testdb=# SELECT
+    t.table_name,
+    COALESCE(c.reltuples::bigint, 0) AS row_estimate,
+    pg_size_pretty(pg_total_relation_size(quote_ident(t.table_name))) AS total_size
+FROM information_schema.tables t
+LEFT JOIN pg_class c
+    ON c.relname = t.table_name
+WHERE t.table_schema = 'public'
+ORDER BY t.table_name;
+ table_name | row_estimate | total_size
+------------+--------------+------------
+ customer   |       300000 | 208 MB
+ district   |          100 | 64 kB
+ history    |       300000 | 25 MB
+ item       |       100000 | 12 MB
+ nation     |           62 | 64 kB
+ new_order  |        90000 | 6808 kB
+ oorder     |       300000 | 40 MB
+ order_line |      3000610 | 380 MB
+ orders     |      3505504 | 472 MB
+ region     |            5 | 56 kB
+ stock      |      1000027 | 361 MB
+ supplier   |        10000 | 2496 kB
+ warehouse  |           10 | 56 kB
+(13 rows)
 
-testdb=# SELECT 'customer' AS table_name, COUNT(*) AS row_count FROM customer
-UNION ALL SELECT 'district', COUNT(*) FROM district
-UNION ALL SELECT 'warehouse', COUNT(*) FROM warehouse
-UNION ALL SELECT 'item', COUNT(*) FROM item
-UNION ALL SELECT 'stock', COUNT(*) FROM stock
-UNION ALL SELECT 'orders', COUNT(*) FROM orders
+testdb=# SELECT 'customer'   AS table_name, COUNT(*) AS row_count FROM customer
+UNION ALL SELECT 'district',   COUNT(*) FROM district
+UNION ALL SELECT 'warehouse',  COUNT(*) FROM warehouse
+UNION ALL SELECT 'item',       COUNT(*) FROM item
+UNION ALL SELECT 'stock',      COUNT(*) FROM stock
+UNION ALL SELECT 'orders',     COUNT(*) FROM orders
 UNION ALL SELECT 'order_line', COUNT(*) FROM order_line
-UNION ALL SELECT 'new_order', COUNT(*) FROM new_order
-UNION ALL SELECT 'history', COUNT(*) FROM history order by 1;
+UNION ALL SELECT 'new_order',  COUNT(*) FROM new_order
+UNION ALL SELECT 'history',    COUNT(*) FROM history
+UNION ALL SELECT 'nation',     COUNT(*) FROM nation
+UNION ALL SELECT 'region',     COUNT(*) FROM region
+UNION ALL SELECT 'supplier',   COUNT(*) FROM supplier
+UNION ALL SELECT 'oorder',     COUNT(*) FROM oorder
+ORDER BY 1;
  table_name | row_count
 ------------+-----------
  customer   |    300000
  district   |       100
  history    |    300000
  item       |    100000
+ nation     |        62
  new_order  |     90000
+ oorder     |    300000
  order_line |   3000644
  orders     |   3505504
+ region     |         5
  stock      |   1000000
+ supplier   |     10000
  warehouse  |        10
-(9 rows)
+(13 rows)
+
+testdb=#
+
 
 testdb=# VACUUM (FREEZE, ANALYZE);
 VACUUM
