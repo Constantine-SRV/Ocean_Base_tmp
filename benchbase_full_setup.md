@@ -142,11 +142,16 @@ java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/postgres/pg_tpcc_10w.xml 
 
 Создание конфига для CH-Benchmark необходимо заранее создать tpcc
 ```bash
-mkdir -p ~/benchbase-configs/oceanbase
-cd ~/benchbase-configs/oceanbase
-cp ~/benchbase-mysql/config/mysql/sample_tpcc_config.xml ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml
-nano ~/benchbase-configs/oceanbase/ob_tpcc_100w.xml
+mkdir -p ~/benchbase-configs/postgres
+cd ~/benchbase-configs/postgres
+cp ~/benchbase-mysql/config/postgres/sample_chbenchmark_config.xml ~/benchbase-configs/postgres/pg_ch_10w.xml
+nano ~/benchbase-configs/postgres/pg_ch_10w.xml
 ```
+запуск теста 
+```bash
+java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w.xml  --execute=true
+```
+## Ocean Base
 конфиг ОБ
 ```xml
     <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;socketTimeout=1800000&amp;connectTimeout=30000</url>
@@ -161,7 +166,7 @@ java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/oceanbase/ob_tpcc_100w.xm
 ```
 
 
-## Тест CH-Benchmark
+### Тест CH-Benchmark
 ```bash
 cp ~/benchbase-mysql/config/mysql/sample_chbenchmark_config.xml ~/benchbase-configs/oceanbase/ob_ch_100w.xml
 nano ~/benchbase-configs/oceanbase/ob_ch_100w.xml
@@ -174,4 +179,9 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_10
 
 ```bash
 java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_100w.xml --execute=true
+```
+
+### Собрать резуьтаты обоих тестов в один zip 2025-11-11_19-25-41 будет виден в выводе тестов
+```bash
+ zip -r ~/benchbase_results.zip ~/benchbase-mysql/results/chbenchmark_2025-11-11_19-25-41.{summary.json,results.csv,params.json} ~/benchbase-postgres/results/chbenchmark_2025-11-11_19-32-47.{summary.json,results.csv,params.json}
 ```
