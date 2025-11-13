@@ -82,7 +82,7 @@ JOIN oceanbase.DBA_OB_UNIT_CONFIGS uc ON rp.UNIT_CONFIG_ID = uc.UNIT_CONFIG_ID ;
 ALTER TENANT app_tenant SET VARIABLES ob_tcp_invited_nodes='%';
 
 ```
-#первое подключение и смена пароля
+# первое подключение и смена пароля
 ```
 # 2. Первое подключение к app_tenant (БЕЗ пароля)
 mysql -h192.168.55.205 -P2881 -uroot@app_tenant -A
