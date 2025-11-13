@@ -92,3 +92,12 @@ ALTER USER root IDENTIFIED BY 'qaz123';
 
 MYSQL_PS1="[\d] \R:\m:\s> " mysql -h192.168.55.205 -P2881 -uroot@app_tenant -p'qaz123' -A --init-command="SET SESSION ob_query_timeout = 10000000000"
 ```
+# добавим курсоров
+```
+-- 2. Увеличим для app_tenant (было 50, ставим 5000)
+ALTER SYSTEM SET open_cursors = 5000 TENANT = app_tenant;
+
+-- 3. Проверим что изменилось
+SHOW PARAMETERS LIKE 'open_cursors';
+```
+
