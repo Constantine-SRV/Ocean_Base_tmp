@@ -78,6 +78,17 @@ JOIN oceanbase.DBA_OB_UNIT_CONFIGS uc ON rp.UNIT_CONFIG_ID = uc.UNIT_CONFIG_ID ;
 2 rows in set (0.01 sec)
 
 [oceanbase] 15:04:13>
+-- 1. В sys tenant: открываем whitelist для подключений с любых IP
+ALTER TENANT app_tenant SET VARIABLES ob_tcp_invited_nodes='%';
+
+```
+#первое подключение и смена пароля
+```
+# 2. Первое подключение к app_tenant (БЕЗ пароля)
+mysql -h192.168.55.205 -P2881 -uroot@app_tenant -A
+
+ALTER USER root IDENTIFIED BY 'qaz123';
 
 
+MYSQL_PS1="[\d] \R:\m:\s> " mysql -h192.168.55.205 -P2881 -uroot@app_tenant -p'qaz123' -A --init-command="SET SESSION ob_query_timeout = 10000000000"
 ```
