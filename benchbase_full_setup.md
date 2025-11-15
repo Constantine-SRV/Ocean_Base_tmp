@@ -155,9 +155,12 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w
 ## Ocean Base
 конфиг ОБ
 ```xml
-    <url>jdbc:mysql://192.168.55.205:2881/tpcc_test?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;socketTimeout=1800000&amp;connectTimeout=30000</url>
-    <username>root@sys</username>
+    <url>jdbc:mysql://192.168.55.205:2881/benchbasedb?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;socketTimeout=1800000&amp;connectTimeout=30000&amp;rewriteBatchedStatements=tr>
+    <username>root@app_tenant</username>
     <password>qaz123</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <batchsize>1000</batchsize>
 ```
 
 ```bash
