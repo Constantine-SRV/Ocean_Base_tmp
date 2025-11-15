@@ -1,0 +1,26 @@
+# диагностика  
+```
+  -- 1. Активные сессии и что они делают
+SELECT * FROM oceanbase.GV$OB_PROCESSLIST WHERE db = 'benchbasedb';
+
+-- 2. Блокировки
+SELECT * FROM oceanbase.GV$OB_LOCKS;
+
+-- 3. Активные транзакции
+SELECT * FROM oceanbase.GV$OB_TRANSACTION_PARTICIPANTS;
+
+-- 4. Ожидания (что тормозит)
+SELECT * FROM oceanbase.GV$SESSION_WAIT;
+
+-- 5. Статус мемтейблов (могут быть переполнены)
+SELECT * FROM oceanbase.GV$OB_MEMSTORE;
+
+-- 6. SQL в процессе выполнения
+SELECT svr_ip, sql_id, query_sql, elapsed_time/1000000 as elapsed_sec 
+FROM oceanbase.GV$OB_SQL_AUDIT 
+WHERE tenant_id = 1 
+  AND request_time > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+ORDER BY request_time DESC 
+LIMIT 20;
+```
+  
