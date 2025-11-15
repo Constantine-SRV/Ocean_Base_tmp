@@ -1,6 +1,6 @@
 ### диагностика.
 
-```
+```bash
   -- 1. Активные сессии и что они делают
 SELECT * FROM oceanbase.GV$OB_PROCESSLIST WHERE db = 'benchbasedb';
 
