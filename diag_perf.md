@@ -78,7 +78,7 @@ CALL analyze_all_tables();
 или
 ```
 
-DROP PROCEDURE IF EXISTS analyze_all_tables;
+DROP PROCEDURE IF EXISTS analyze_all_tables_verbose;
 
 -- Создать новую с выводом статистики
 DELIMITER $$
