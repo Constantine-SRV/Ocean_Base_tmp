@@ -34,3 +34,37 @@ ALTER SYSTEM SET writing_throttling_trigger_percentage = 100;
 -- Это OceanBase-специфичная команда, которая сбросит данные и обновит статистику
 ALTER SYSTEM MAJOR FREEZE;
 ```
+```
+DELIMITER $$
+
+CREATE PROCEDURE analyze_all_tables()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE tbl_name VARCHAR(255);
+    DECLARE cur CURSOR FOR 
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = DATABASE();
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO tbl_name;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        SET @sql = CONCAT('ANALYZE TABLE ', tbl_name);
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END LOOP;
+    CLOSE cur;
+END$$
+
+DELIMITER ;
+
+-- Выполнить
+CALL analyze_all_tables();
+
+```
+
