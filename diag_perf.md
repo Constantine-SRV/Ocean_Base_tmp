@@ -34,6 +34,32 @@ ALTER SYSTEM SET writing_throttling_trigger_percentage = 100;
 -- Это OceanBase-специфичная команда, которая сбросит данные 
 ALTER SYSTEM MAJOR FREEZE;
 ```
+# мониторинг памяти
+```
+SELECT 
+    TENANT_ID,
+    ROUND(MEMSTORE_USED/1024/1024/1024, 2) as used_gb,
+    ROUND(MEMSTORE_LIMIT/1024/1024/1024, 2) as limit_gb,
+    ROUND((MEMSTORE_LIMIT - MEMSTORE_USED)/1024/1024/1024, 2) as free_gb,
+    ROUND(MEMSTORE_USED/MEMSTORE_LIMIT * 100, 2) as usage_pct,
+    ROUND((1 - MEMSTORE_USED/MEMSTORE_LIMIT) * 100, 2) as free_pct,
+    FREEZE_CNT,
+    CASE 
+        WHEN MEMSTORE_USED/MEMSTORE_LIMIT > 0.9 THEN 'CRITICAL'
+        WHEN MEMSTORE_USED/MEMSTORE_LIMIT > 0.7 THEN 'WARNING'
+        ELSE 'OK'
+    END as status
+FROM oceanbase.GV$OB_MEMSTORE ;
+```
++-----------+---------+----------+---------+-----------+----------+------------+--------+
+| TENANT_ID | used_gb | limit_gb | free_gb | usage_pct | free_pct | FREEZE_CNT | status |
++-----------+---------+----------+---------+-----------+----------+------------+--------+
+|         1 |    0.04 |     0.90 |    0.86 |      3.91 |    96.09 |          6 | OK     |
+|      1001 |    0.07 |     0.60 |    0.53 |     11.07 |    88.93 |          7 | OK     |
+|      1002 |    0.29 |     3.30 |    3.01 |      8.94 |    91.06 |        166 | OK     |
++-----------+---------+----------+---------+-----------+----------+------------+--------+
+
+
 ### процедура обновляет все таблицы в базе очень удобно
 выполнить до и после запрос для понимания разницы
 ```
