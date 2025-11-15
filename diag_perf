@@ -29,4 +29,8 @@ LIMIT 20;
 ```
 ALTER SYSTEM SET writing_throttling_trigger_percentage = 100;
 ```
-  
+
+```
+-- Это OceanBase-специфичная команда, которая сбросит данные и обновит статистику
+ALTER SYSTEM MAJOR FREEZE;
+```
