@@ -34,7 +34,7 @@ ALTER SYSTEM SET writing_throttling_trigger_percentage = 100;
 -- Это OceanBase-специфичная команда, которая сбросит данные 
 ALTER SYSTEM MAJOR FREEZE;
 ```
-# мониторинг памяти
+### мониторинг памяти
 ```
 SELECT 
     TENANT_ID,
