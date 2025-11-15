@@ -1,7 +1,8 @@
 # Тестирование через BenchBase
 
 тестирование через benchbase
-
+(Run the TPC-C benchmark test in OceanBase Database)
+https://en.oceanbase.com/docs/community-observer-en-10000000000601813
 
 ## установка необходима  <java.version>23</java.version>
 ```bash
