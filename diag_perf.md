@@ -75,4 +75,62 @@ DELIMITER ;
 CALL analyze_all_tables();
 
 ```
+или
+```
 
+DROP PROCEDURE IF EXISTS analyze_all_tables;
+
+-- Создать новую с выводом статистики
+DELIMITER $$
+
+CREATE PROCEDURE analyze_all_tables_verbose()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE tbl_name VARCHAR(255);
+    DECLARE tbl_count INT DEFAULT 0;
+    DECLARE total_count INT DEFAULT 0;
+    DECLARE start_time DATETIME;
+    DECLARE cur CURSOR FOR 
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = DATABASE()
+        ORDER BY table_name;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Подсчитать общее количество таблиц
+    SELECT COUNT(*) INTO total_count
+    FROM information_schema.tables 
+    WHERE table_schema = DATABASE();
+
+    SELECT CONCAT('=== Starting ANALYZE for ', total_count, ' tables ===') AS status;
+
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO tbl_name;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        
+        SET tbl_count = tbl_count + 1;
+        SET start_time = NOW();
+        
+        -- Вывести информацию о текущей таблице
+        SELECT CONCAT('[', tbl_count, '/', total_count, '] Analyzing table: ', tbl_name, '...') AS status;
+        
+        -- Выполнить ANALYZE
+        SET @sql = CONCAT('ANALYZE TABLE ', tbl_name);
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+        
+        -- Вывести время выполнения
+        SELECT CONCAT('    Completed in ', TIMESTAMPDIFF(SECOND, start_time, NOW()), ' seconds') AS status;
+        
+    END LOOP;
+    CLOSE cur;
+
+    SELECT CONCAT('=== ANALYZE completed for all ', total_count, ' tables ===') AS status;
+END$$
+
+DELIMITER ;
+```
