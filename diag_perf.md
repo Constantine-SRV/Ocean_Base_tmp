@@ -1,4 +1,4 @@
-### диагностика.
+## диагностика.
 
 ```bash
   -- 1. Активные сессии и что они делают
@@ -34,7 +34,7 @@ ALTER SYSTEM SET writing_throttling_trigger_percentage = 100;
 -- Это OceanBase-специфичная команда, которая сбросит данные 
 ALTER SYSTEM MAJOR FREEZE;
 ```
-# процедура обновляет все таблицы в базе очень удобно
+### процедура обновляет все таблицы в базе очень удобно
 выполнить до и после запрос для понимания разницы
 ```
 SELECT     t.table_name,     COALESCE(s.row_count, 0) AS row_count,     CONCAT(ROUND(s.data_size / 1024 / 1024, 2), ' MB') AS total_size FROM information_schema.tables AS t LEFT JOIN (     SELECT         table_name,         SUM(data_length + index_length) AS data_size,         SUM(table_rows) AS row_count     FROM information_schema.tables     WHERE table_schema = DATABASE()     GROUP
