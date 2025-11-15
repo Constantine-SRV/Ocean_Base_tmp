@@ -25,4 +25,8 @@ ORDER BY request_time DESC
 LIMIT 20;
 
 ```
+
+```
+ALTER SYSTEM SET writing_throttling_trigger_percentage = 100;
+```
   
