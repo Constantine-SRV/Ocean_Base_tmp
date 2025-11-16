@@ -153,6 +153,11 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w
 ```bash
 java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_10w.xml  --execute=true
 ```
+или если не хватает памяти
+```
+java -Xms2G -Xmx4G -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/postgres/pg_ch_100w.xml --execute=true
+```
+
 ## Ocean Base
 конфиг ОБ
 ```xml
