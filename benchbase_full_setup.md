@@ -306,28 +306,28 @@ JOIN oceanbase.dba_ob_tablet_replicas r
 WHERE d.database_name ='benchbasedb'
 -- NOT IN ('oceanbase','mysql','information_schema','sys','ocs','sys_external_tbs')
 GROUP BY d.database_name, t.table_name, t.table_type, ts.row_cnt, ts.avg_row_len, ts.last_analyzed
-ORDER BY d.database_name, object_type, real_data_mb DESC;
+ORDER BY  1,2; 
+
 +---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
 | database_name | table_name                     | object_type | total_rows | avg_row_len | approx_data_mb | real_data_mb | required_mb | last_analyzed              |
 +---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+| benchbasedb   | customer                       | TABLE       |    3000000 |       819.0 |        2343.18 |       945.48 |      945.48 | 2025-11-16 14:16:32.926813 |
+| benchbasedb   | district                       | TABLE       |       1000 |       228.0 |           0.22 |         0.05 |        0.05 | 2025-11-16 14:16:33.015227 |
+| benchbasedb   | history                        | TABLE       |    3000000 |       164.0 |         469.21 |        45.80 |       45.80 | 2025-11-16 14:16:19.160688 |
+| benchbasedb   | item                           | TABLE       |     100000 |       135.0 |          12.87 |         4.53 |        4.53 | 2025-11-16 14:16:52.536466 |
+| benchbasedb   | nation                         | TABLE       |         62 |       134.0 |           0.01 |         0.00 |        0.00 | 2025-11-16 14:16:09.449831 |
+| benchbasedb   | new_order                      | TABLE       |     900000 |        60.0 |          51.50 |         0.24 |        0.25 | 2025-11-16 14:16:18.012746 |
+| benchbasedb   | oorder                         | TABLE       |    3000000 |       154.0 |         440.60 |        10.46 |       10.46 | 2025-11-16 14:16:18.475621 |
+| benchbasedb   | order_line                     | TABLE       |   30001892 |       205.0 |        5865.47 |       567.74 |      567.74 | 2025-11-16 14:16:17.864870 |
+| benchbasedb   | region                         | TABLE       |          5 |       174.0 |           0.00 |         0.00 |        0.00 | 2025-11-16 14:16:09.484616 |
+| benchbasedb   | stock                          | TABLE       |   10000000 |       515.0 |        4911.42 |      1668.13 |     1668.13 | 2025-11-16 14:16:52.430570 |
+| benchbasedb   | supplier                       | TABLE       |      10000 |       254.0 |           2.42 |         0.00 |        0.00 | 2025-11-16 14:16:09.405067 |
+| benchbasedb   | warehouse                      | TABLE       |        100 |       188.0 |           0.02 |         0.01 |        0.01 | 2025-11-16 14:16:52.584649 |
 | benchbasedb   | __idx_500286_idx_customer_name | INDEX       |    2640000 |       107.0 |         269.39 |        45.33 |       45.33 | 2025-11-16 05:59:45.310423 |
 | benchbasedb   | __idx_500291_o_w_id            | INDEX       |    2640000 |        80.0 |         201.42 |        10.82 |       10.82 | 2025-11-16 06:00:03.238869 |
-| benchbasedb   | stock                          | TABLE       |   10000000 |       515.0 |        4911.42 |      1668.13 |     1668.13 | 2025-11-16 14:16:52.430570 |
-| benchbasedb   | customer                       | TABLE       |    3000000 |       819.0 |        2343.18 |       945.48 |      945.48 | 2025-11-16 14:16:32.926813 |
-| benchbasedb   | order_line                     | TABLE       |   30001892 |       205.0 |        5865.47 |       567.74 |      567.74 | 2025-11-16 14:16:17.864870 |
-| benchbasedb   | history                        | TABLE       |    3000000 |       164.0 |         469.21 |        45.80 |       45.80 | 2025-11-16 14:16:19.160688 |
-| benchbasedb   | oorder                         | TABLE       |    3000000 |       154.0 |         440.60 |        10.46 |       10.46 | 2025-11-16 14:16:18.475621 |
-| benchbasedb   | item                           | TABLE       |     100000 |       135.0 |          12.87 |         4.53 |        4.53 | 2025-11-16 14:16:52.536466 |
-| benchbasedb   | new_order                      | TABLE       |     900000 |        60.0 |          51.50 |         0.24 |        0.25 | 2025-11-16 14:16:18.012746 |
-| benchbasedb   | district                       | TABLE       |       1000 |       228.0 |           0.22 |         0.05 |        0.05 | 2025-11-16 14:16:33.015227 |
-| benchbasedb   | warehouse                      | TABLE       |        100 |       188.0 |           0.02 |         0.01 |        0.01 | 2025-11-16 14:16:52.584649 |
-| benchbasedb   | region                         | TABLE       |          5 |       174.0 |           0.00 |         0.00 |        0.00 | 2025-11-16 14:16:09.484616 |
-| benchbasedb   | nation                         | TABLE       |         62 |       134.0 |           0.01 |         0.00 |        0.00 | 2025-11-16 14:16:09.449831 |
-| benchbasedb   | supplier                       | TABLE       |      10000 |       254.0 |           2.42 |         0.00 |        0.00 | 2025-11-16 14:16:09.405067 |
 +---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
-14 rows in set (0.16 sec)
+14 rows in set (0.02 sec)
 
-[benchbasedb] 19:01:38>
 
 
 
