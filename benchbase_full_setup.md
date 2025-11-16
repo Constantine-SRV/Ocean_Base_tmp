@@ -193,96 +193,12 @@ java -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/oceanbase/ob_ch_10
  zip -r ~/benchbase_results.zip ~/benchbase-mysql/results/chbenchmark_2025-11-11_19-25-41.{summary.json,results.csv,params.json} ~/benchbase-postgres/results/chbenchmark_2025-11-11_19-32-47.{summary.json,results.csv,params.json}
 ```
 ## Запросы по размерам таблиц
-### 10 складов ПГ
+### 100 складов ПГ
 ```
-testdb=# VACUUM (FREEZE, ANALYZE);
+
+benchbasedb=# VACUUM (FREEZE, ANALYZE);
 VACUUM
-
-testdb=# SELECT
-    t.table_name,
-    COALESCE(c.reltuples::bigint, 0) AS row_estimate,
-    pg_size_pretty(pg_total_relation_size(quote_ident(t.table_name))) AS total_size
-FROM information_schema.tables t
-LEFT JOIN pg_class c
-    ON c.relname = t.table_name
-WHERE t.table_schema = 'public'
-ORDER BY t.table_name;
- table_name | row_estimate | total_size
-------------+--------------+------------
- customer   |       300000 | 208 MB
- district   |          100 | 64 kB
- history    |       300000 | 25 MB
- item       |       100000 | 12 MB
- nation     |           62 | 64 kB
- new_order  |        90000 | 6808 kB
- oorder     |       300000 | 40 MB
- order_line |      3000610 | 380 MB
- orders     |      3505504 | 472 MB
- region     |            5 | 56 kB
- stock      |      1000027 | 361 MB
- supplier   |        10000 | 2496 kB
- warehouse  |           10 | 56 kB
-(13 rows)
-
-testdb=# SELECT 'customer'   AS table_name, COUNT(*) AS row_count FROM customer
-UNION ALL SELECT 'district',   COUNT(*) FROM district
-UNION ALL SELECT 'warehouse',  COUNT(*) FROM warehouse
-UNION ALL SELECT 'item',       COUNT(*) FROM item
-UNION ALL SELECT 'stock',      COUNT(*) FROM stock
-UNION ALL SELECT 'orders',     COUNT(*) FROM orders
-UNION ALL SELECT 'order_line', COUNT(*) FROM order_line
-UNION ALL SELECT 'new_order',  COUNT(*) FROM new_order
-UNION ALL SELECT 'history',    COUNT(*) FROM history
-UNION ALL SELECT 'nation',     COUNT(*) FROM nation
-UNION ALL SELECT 'region',     COUNT(*) FROM region
-UNION ALL SELECT 'supplier',   COUNT(*) FROM supplier
-UNION ALL SELECT 'oorder',     COUNT(*) FROM oorder
-ORDER BY 1;
- table_name | row_count
-------------+-----------
- customer   |    300000
- district   |       100
- history    |    300000
- item       |    100000
- nation     |        62
- new_order  |     90000
- oorder     |    300000
- order_line |   3000644
- orders     |   3505504
- region     |         5
- stock      |   1000000
- supplier   |     10000
- warehouse  |        10
-(13 rows)
-
-testdb=#
-
-testdb=# SELECT
-  table_name,
-  pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) AS total_size
-FROM information_schema.tables
-WHERE table_schema='public'
-ORDER BY 1;
- table_name | total_size
-------------+------------
- customer   | 208 MB
- district   | 64 kB
- history    | 25 MB
- item       | 12 MB
- nation     | 64 kB
- new_order  | 6808 kB
- oorder     | 40 MB
- order_line | 380 MB
- orders     | 472 MB
- region     | 56 kB
- stock      | 361 MB
- supplier   | 2496 kB
- warehouse  | 56 kB
-(13 rows)
-```
-аналог первого все таблицы
-```
-testdb=# SELECT
+benchbasedb=# SELECT
     table_name,
     (xpath('/row/count/text()', xml_count))[1]::text::bigint AS row_count,
     pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) AS total_size
@@ -296,21 +212,123 @@ FROM (
 ORDER BY table_name;
  table_name | row_count | total_size
 ------------+-----------+------------
- customer   |    300000 | 208 MB
- district   |       100 | 64 kB
- history    |    300000 | 25 MB
+ customer   |   3000000 | 2074 MB
+ district   |      1000 | 200 kB
+ history    |   3000000 | 247 MB
  item       |    100000 | 12 MB
  nation     |        62 | 64 kB
- new_order  |     90000 | 6808 kB
- oorder     |    300000 | 40 MB
- order_line |   3000644 | 380 MB
- orders     |   3505504 | 472 MB
+ new_order  |    900000 | 65 MB
+ oorder     |   3000000 | 402 MB
+ order_line |  30001892 | 3798 MB
  region     |         5 | 56 kB
- stock      |   1000000 | 361 MB
+ stock      |  10000000 | 3606 MB
  supplier   |     10000 | 2496 kB
- warehouse  |        10 | 56 kB
-(13 rows)
+ warehouse  |       100 | 64 kB
+(12 rows)
 
-testdb=#
+benchbasedb=#  SELECT
+    t.table_name,
+    COALESCE(c.reltuples::bigint, 0) AS row_estimate,
+    pg_size_pretty(pg_total_relation_size(quote_ident(t.table_name))) AS total_size
+FROM information_schema.tables t
+LEFT JOIN pg_class c
+    ON c.relname = t.table_name
+WHERE t.table_schema = 'public'
+ORDER BY t.table_name;
+ table_name | row_estimate | total_size
+------------+--------------+------------
+ customer   |      2999656 | 2074 MB
+ district   |         1000 | 200 kB
+ history    |      2999999 | 247 MB
+ item       |       100000 | 12 MB
+ nation     |           62 | 64 kB
+ new_order  |       900000 | 65 MB
+ oorder     |      3000000 | 402 MB
+ order_line |     30001914 | 3798 MB
+ region     |            5 | 56 kB
+ stock      |     10000276 | 3606 MB
+ supplier   |        10000 | 2496 kB
+ warehouse  |          100 | 64 kB
+(12 rows)
+
+benchbasedb=#
+
+```
+### 100 складов ОБ
+```
+[benchbasedb] 09:09:28> CALL analyze_all_tables();
+Query OK, 0 rows affected (43.27 sec)
+
+[benchbasedb] 09:16:52> SELECT     t.table_name,     COALESCE(s.row_count, 0) AS row_count,     CONCAT(ROUND(s.data_size / 1024 / 1024, 2), ' MB') AS total_size FROM information_schema.tables AS t LEFT JOIN (     SELECT         table_name,         SUM(  data_length + index_length) AS data_size,         SUM(table_rows) AS row_count     FROM information_schema.tables     WHERE table_schema = DATABASE()     GROUP BY table_name ) AS s ON s.table_name = t.table_name WHERE t.table_schema = DATABASE() ORDER
+BY t.table_name;
++------------+-----------+------------+
+| table_name | row_count | total_size |
++------------+-----------+------------+
+| customer   |   3000000 | 1054.00 MB |
+| district   |      1000 | 2.00 MB    |
+| history    |   3000000 | 56.00 MB   |
+| item       |    100000 | 6.00 MB    |
+| nation     |        62 | 0.00 MB    |
+| new_order  |    900000 | 2.00 MB    |
+| oorder     |   3000000 | 46.00 MB   |
+| order_line |  30001892 | 592.00 MB  |
+| region     |         5 | 0.00 MB    |
+| stock      |  10000000 | 1724.00 MB |
+| supplier   |     10000 | 0.00 MB    |
+| warehouse  |       100 | 2.00 MB    |
++------------+-----------+------------+
+12 rows in set (0.03 sec)
+
+
+[benchbasedb] 19:00:11> SELECT
+    d.database_name,
+    t.table_name,
+    CASE t.table_type
+        WHEN 3 THEN 'TABLE'
+        WHEN 5 THEN 'INDEX'
+        ELSE CONCAT('TYPE_', t.table_type)
+    END AS object_type,
+    ts.row_cnt AS total_rows,
+    ROUND(ts.avg_row_len, 1) AS avg_row_len,
+    ROUND(ts.row_cnt * ts.avg_row_len / 1024 / 1024, 2) AS approx_data_mb,
+    ROUND(SUM(r.data_size) / 1024 / 1024, 2) AS real_data_mb,
+    ROUND(SUM(r.required_size) / 1024 / 1024, 2) AS required_mb,
+    MAX(ts.last_analyzed) AS last_analyzed
+FROM oceanbase.__all_table t
+JOIN oceanbase.__all_database d
+    ON t.database_id = d.database_id
+LEFT JOIN oceanbase.__all_table_stat ts
+    ON ts.table_id = t.table_id
+JOIN oceanbase.__all_tablet_to_ls ttl
+    ON t.table_id = ttl.table_id
+JOIN oceanbase.dba_ob_tablet_replicas r
+    ON ttl.tablet_id = r.tablet_id
+WHERE d.database_name ='benchbasedb'
+-- NOT IN ('oceanbase','mysql','information_schema','sys','ocs','sys_external_tbs')
+GROUP BY d.database_name, t.table_name, t.table_type, ts.row_cnt, ts.avg_row_len, ts.last_analyzed
+ORDER BY d.database_name, object_type, real_data_mb DESC;
++---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+| database_name | table_name                     | object_type | total_rows | avg_row_len | approx_data_mb | real_data_mb | required_mb | last_analyzed              |
++---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+| benchbasedb   | __idx_500286_idx_customer_name | INDEX       |    2640000 |       107.0 |         269.39 |        45.33 |       45.33 | 2025-11-16 05:59:45.310423 |
+| benchbasedb   | __idx_500291_o_w_id            | INDEX       |    2640000 |        80.0 |         201.42 |        10.82 |       10.82 | 2025-11-16 06:00:03.238869 |
+| benchbasedb   | stock                          | TABLE       |   10000000 |       515.0 |        4911.42 |      1668.13 |     1668.13 | 2025-11-16 14:16:52.430570 |
+| benchbasedb   | customer                       | TABLE       |    3000000 |       819.0 |        2343.18 |       945.48 |      945.48 | 2025-11-16 14:16:32.926813 |
+| benchbasedb   | order_line                     | TABLE       |   30001892 |       205.0 |        5865.47 |       567.74 |      567.74 | 2025-11-16 14:16:17.864870 |
+| benchbasedb   | history                        | TABLE       |    3000000 |       164.0 |         469.21 |        45.80 |       45.80 | 2025-11-16 14:16:19.160688 |
+| benchbasedb   | oorder                         | TABLE       |    3000000 |       154.0 |         440.60 |        10.46 |       10.46 | 2025-11-16 14:16:18.475621 |
+| benchbasedb   | item                           | TABLE       |     100000 |       135.0 |          12.87 |         4.53 |        4.53 | 2025-11-16 14:16:52.536466 |
+| benchbasedb   | new_order                      | TABLE       |     900000 |        60.0 |          51.50 |         0.24 |        0.25 | 2025-11-16 14:16:18.012746 |
+| benchbasedb   | district                       | TABLE       |       1000 |       228.0 |           0.22 |         0.05 |        0.05 | 2025-11-16 14:16:33.015227 |
+| benchbasedb   | warehouse                      | TABLE       |        100 |       188.0 |           0.02 |         0.01 |        0.01 | 2025-11-16 14:16:52.584649 |
+| benchbasedb   | region                         | TABLE       |          5 |       174.0 |           0.00 |         0.00 |        0.00 | 2025-11-16 14:16:09.484616 |
+| benchbasedb   | nation                         | TABLE       |         62 |       134.0 |           0.01 |         0.00 |        0.00 | 2025-11-16 14:16:09.449831 |
+| benchbasedb   | supplier                       | TABLE       |      10000 |       254.0 |           2.42 |         0.00 |        0.00 | 2025-11-16 14:16:09.405067 |
++---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+14 rows in set (0.16 sec)
+
+[benchbasedb] 19:01:38>
+
+
 
 ```
