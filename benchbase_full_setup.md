@@ -93,6 +93,13 @@ git clone https://github.com/cmu-db/benchbase.git benchbase-mysql-src
 cd benchbase-mysql-src
 ./mvnw clean package -P mysql -DskipTests
 ```
+из своего форка
+```
+cd ~
+git clone https://github.com/Constantine-SRV/benchbase.git benchbase-oceanbase-src
+cd benchbase-oceanbase-src
+./mvnw clean package -P mysql -DskipTests
+```
 
 ```bash
 # Распаковка готовой сборки в домашний каталог
