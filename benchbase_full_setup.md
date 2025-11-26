@@ -95,10 +95,21 @@ cd benchbase-mysql-src
 ```
 из своего форка
 ```
+rm -rf ~/benchbase-mysql-src
+rm -rf ~/benchbase-oceanbase-src
+rm -rf ~/benchbase-mysql
+
 cd ~
-git clone https://github.com/Constantine-SRV/benchbase.git benchbase-oceanbase-src
-cd benchbase-oceanbase-src
+git clone https://github.com/Constantine-SRV/benchbase.git benchbase-mysql-src
+cd benchbase-mysql-src
+
+git remote -v
+
 ./mvnw clean package -P mysql -DskipTests
+
+# Распаковка готовой сборки в домашний каталог
+tar -xzf target/benchbase-mysql.tgz -C ~/
+
 ```
 
 ```bash
