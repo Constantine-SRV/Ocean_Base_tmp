@@ -205,6 +205,42 @@ CREATE INDEX idx_customer_name ON customer (c_w_id, c_d_id, c_last, c_first);
 CREATE INDEX supplier_nation_idx ON supplier (su_nationkey) LOCAL;
 
 ```
+процедура обновления статистики всех таблиц
+```
+DELIMITER $$
+
+CREATE PROCEDURE analyze_all_tables()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE tbl_name VARCHAR(255);
+    DECLARE cur CURSOR FOR 
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = DATABASE();
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO tbl_name;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        SET @sql = CONCAT('ANALYZE TABLE ', tbl_name);
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END LOOP;
+    CLOSE cur;
+END$$
+
+DELIMITER ;
+
+-- Выполнить
+CALL analyze_all_tables();
+
+```
+задать параметры под тест 
+https://en.oceanbase.com/docs/common-oceanbase-database-10000000001970925#complex_oltp
 
 ### Тест CH-Benchmark
 ```bash
