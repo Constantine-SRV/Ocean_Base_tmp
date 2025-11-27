@@ -195,7 +195,16 @@ cp ~/benchbase-mysql/config/mysql/sample_tpcc_config.xml ~/benchbase-configs/oce
 nano ~/benchbase-configs/oceanbase/ob_tpcc_10w.xml
 java -jar benchbase.jar -b tpcc -c ~/benchbase-configs/oceanbase/ob_tpcc_10w.xml --create=true --load=true
 ```
+не забть индексы
+```
+USE benchbasedb;
+-- tpcc
+CREATE INDEX idx_customer_name ON customer (c_w_id, c_d_id, c_last, c_first);
 
+-- CH-Benchmark
+CREATE INDEX supplier_nation_idx ON supplier (su_nationkey) LOCAL;
+
+```
 
 ### Тест CH-Benchmark
 ```bash
