@@ -80,19 +80,23 @@ ORDER BY data_gb DESC;
 
 ```sql
 -- ✅ САМЫЙ ТОЧНЫЙ МЕТОД - реальный размер на диске
-SELECT 
+SELECT
     t.table_name,
+    CASE t.table_type
+        WHEN 3 THEN 'TABLE'
+        WHEN 5 THEN 'INDEX'
+    END as object_type,
+    COUNT(DISTINCT r.TABLET_ID) as tablet_count,
     ROUND(SUM(r.DATA_SIZE) / 1024 / 1024, 2) as data_mb,
-    ROUND(SUM(r.REQUIRED_SIZE) / 1024 / 1024, 2) as required_mb,
-    COUNT(DISTINCT r.TABLET_ID) as tablet_count
+    ROUND(SUM(r.REQUIRED_SIZE) / 1024 / 1024, 2) as required_mb
 FROM oceanbase.__all_table t
 JOIN oceanbase.__all_tablet_to_ls ttl ON t.table_id = ttl.table_id
 JOIN oceanbase.DBA_OB_TABLET_REPLICAS r ON ttl.tablet_id = r.TABLET_ID
 WHERE t.database_id = (
-    SELECT database_id FROM oceanbase.__all_database WHERE database_name = 'testdb'
+    SELECT database_id FROM oceanbase.__all_database WHERE database_name = 'benchbasedb'
 )
-AND t.table_name = 'taxi_trips1'
-GROUP BY t.table_name;
+GROUP BY t.table_name, t.table_type
+ORDER BY data_mb DESC;
 ```
 
 **Почему этот метод лучший:**
