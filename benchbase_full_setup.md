@@ -435,7 +435,33 @@ SELECT     t.table_name,     COALESCE(s.row_count, 0) AS row_count,     CONCAT(R
 +------------+------------+-------------+
 9 rows in set (0.12 sec)
 
-
+SELECT
+    d.database_name,
+    t.table_name,
+    CASE t.table_type
+        WHEN 3 THEN 'TABLE'
+        WHEN 5 THEN 'INDEX'
+        ELSE CONCAT('TYPE_', t.table_type)
+    END AS object_type,
+    ts.row_cnt AS total_rows,
+    ROUND(ts.avg_row_len, 1) AS avg_row_len,
+    ROUND(ts.row_cnt * ts.avg_row_len / 1024 / 1024, 2) AS approx_data_mb,
+    ROUND(SUM(r.data_size) / 1024 / 1024, 2) AS real_data_mb,
+    ROUND(SUM(r.required_size) / 1024 / 1024, 2) AS required_mb,
+    MAX(ts.last_analyzed) AS last_analyzed
+FROM oceanbase.__all_table t
+JOIN oceanbase.__all_database d
+    ON t.database_id = d.database_id
+LEFT JOIN oceanbase.__all_table_stat ts
+    ON ts.table_id = t.table_id
+JOIN oceanbase.__all_tablet_to_ls ttl
+    ON t.table_id = ttl.table_id
+JOIN oceanbase.dba_ob_tablet_replicas r
+    ON ttl.tablet_id = r.tablet_id
+WHERE d.database_name ='benchbasedb'
+-- NOT IN ('oceanbase','mysql','information_schema','sys','ocs','sys_external_tbs')
+GROUP BY d.database_name, t.table_name, t.table_type, ts.row_cnt, ts.avg_row_len, ts.last_analyzed
+ORDER BY  1,2; 
 +---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
 | database_name | table_name                     | object_type | total_rows | avg_row_len | approx_data_mb | real_data_mb | required_mb | last_analyzed              |
 +---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
@@ -485,8 +511,16 @@ SELECT     t.table_name,     COALESCE(s.row_count, 0) AS row_count,     CONCAT(R
 +---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
 43 rows in set (0.14 sec)
 
-[benchbasedb] 20:07:47>
 
 
+ SELECT      svr_ip,     ROUND(DATA_DISK_CAPACITY / 1024 / 1024 / 1024, 2) as capacity_gb,     ROUND(DATA_DISK_IN_USE / 1024 / 1024 / 1024, 2) as in_use_gb,     ROUND((DATA_DISK_CAPACITY - DATA_DISK_IN_USE) / 1024 / 1024 / 1024, 2) as free_gb,     ROUND(DATA_DISK_IN_USE / DATA_DISK_CAPACITY * 100, 2) as used_pct FROM oceanbase.GV$OB_SERVERS;
++----------------+-------------+-----------+---------+----------+
+| svr_ip         | capacity_gb | in_use_gb | free_gb | used_pct |
++----------------+-------------+-----------+---------+----------+
+| 192.168.32.158 |      350.00 |    151.83 |  198.17 |    43.38 |
+| 192.168.32.159 |      350.00 |    150.44 |  199.56 |    42.98 |
+| 192.168.32.160 |      350.00 |    147.68 |  202.32 |    42.19 |
++----------------+-------------+-----------+---------+----------+
+3 rows in set (0.00 sec)
 
 ```
