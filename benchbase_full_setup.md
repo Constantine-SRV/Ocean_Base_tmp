@@ -397,7 +397,95 @@ ORDER BY  1,2;
 | benchbasedb   | __idx_500291_o_w_id            | INDEX       |    2640000 |        80.0 |         201.42 |        10.82 |       10.82 | 2025-11-16 06:00:03.238869 |
 +---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
 14 rows in set (0.02 sec)
+```
 
+### 4000 складов ОБ
+```
+ SELECT     t.table_name,     CASE t.table_type         WHEN 3 THEN 'TABLE'         WHEN 5 THEN 'INDEX'     END as object_type,     COUNT(DISTINCT r.TABLET_ID) as tablet_count,     ROUND(SUM(r.DATA_SIZE) / 1024 / 1024, 2) as data_mb,     ROUND(SUM(r.REQUIRED_SIZE) / 1024 / 1024, 2) as required_mb FROM oceanbase.__all_table t JOIN oceanbase.__all_tablet_to_ls ttl ON t.table_id = ttl.table_id JOIN oceanbase.DBA_OB_TABLET_REPLICAS r ON ttl.tablet_id = r.TABLET_ID WHERE t.database_id = (     SELECT database_id FROM oceanbase.__all_database WHERE database_name = 'benchbasedb' ) GROUP BY t.table_name, t.table_type ORDER BY data_mb DESC;
++--------------------------------+-------------+--------------+-----------+-------------+
+| table_name                     | object_type | tablet_count | data_mb   | required_mb |
++--------------------------------+-------------+--------------+-----------+-------------+
+| stock                          | TABLE       |            9 | 173797.14 |   173797.14 |
+| customer                       | TABLE       |            9 |  89673.28 |    89673.28 |
+| order_line                     | TABLE       |            9 |  55672.71 |    55672.71 |
+| __idx_500463_idx_customer_name | INDEX       |            9 |   4924.95 |     4924.95 |
+| history                        | TABLE       |            9 |   4195.40 |     4195.40 |
+| oorder                         | TABLE       |            9 |    853.86 |      853.86 |
+| __idx_500486_o_w_id            | INDEX       |            9 |    691.65 |      691.65 |
+| new_order                      | TABLE       |            9 |      6.54 |        6.73 |
+| warehouse                      | TABLE       |            9 |      0.00 |        0.00 |
+| item                           | TABLE       |            1 |      0.00 |        0.00 |
+| district                       | TABLE       |            9 |      0.00 |        0.00 |
++--------------------------------+-------------+--------------+-----------+-------------+
+11 rows in set (0.02 sec)
+
+SELECT     t.table_name,     COALESCE(s.row_count, 0) AS row_count,     CONCAT(ROUND(s.data_size / 1024 / 1024, 2), ' MB') AS total_size FROM information_schema.tables AS t LEFT JOIN (     SELECT         table_name,         SUM(  data_length + index_length) AS data_size,         SUM(table_rows) AS row_count     FROM information_schema.tables     WHERE table_schema = DATABASE()     GROUP BY table_name ) AS s ON s.table_name = t.table_name WHERE t.table_schema = DATABASE() ORDER BY t.table_name;
++------------+------------+-------------+
+| table_name | row_count  | total_size  |
++------------+------------+-------------+
+| customer   |  119970000 | 46368.00 MB |
+| district   |      39990 | 36.00 MB    |
+| history    |  119970000 | 2444.00 MB  |
+| item       |     100000 | 8.00 MB     |
+| new_order  |   35991000 | 256.00 MB   |
+| oorder     |  119970000 | 1742.00 MB  |
+| order_line | 1199678863 | 29312.00 MB |
+| stock      |  399900000 | 74682.00 MB |
+| warehouse  |       3999 | 36.00 MB    |
++------------+------------+-------------+
+9 rows in set (0.12 sec)
+
+
++---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+| database_name | table_name                     | object_type | total_rows | avg_row_len | approx_data_mb | real_data_mb | required_mb | last_analyzed              |
++---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+| benchbasedb   | customer                       | TABLE       |   13350000 |       819.0 |       10427.14 |    269019.84 |   269019.84 | 2025-11-28 23:39:01.495245 |
+| benchbasedb   | customer                       | TABLE       |   13320000 |       819.0 |       10403.71 |    538039.69 |   538039.69 | 2025-11-28 23:39:01.495245 |
+| benchbasedb   | customer                       | TABLE       |  119970000 |       819.0 |       93703.68 |     89673.28 |    89673.28 | 2025-11-28 23:39:02.398769 |
+| benchbasedb   | district                       | TABLE       |      39990 |       228.0 |           8.70 |         2.09 |        2.11 | 2025-11-29 00:27:38.469833 |
+| benchbasedb   | district                       | TABLE       |       4440 |       228.0 |           0.97 |        12.56 |       12.66 | 2025-11-29 00:27:38.453240 |
+| benchbasedb   | district                       | TABLE       |       4450 |       228.0 |           0.97 |         6.28 |        6.33 | 2025-11-29 00:27:38.453240 |
+| benchbasedb   | history                        | TABLE       |   13350000 |       164.0 |        2087.97 |     12586.19 |    12586.19 | 2025-11-28 23:39:16.234651 |
+| benchbasedb   | history                        | TABLE       |   13320000 |       164.0 |        2083.28 |     25172.38 |    25172.38 | 2025-11-28 23:39:16.234651 |
+| benchbasedb   | history                        | TABLE       |  119970000 |       164.0 |       18763.62 |      4195.40 |     4195.40 | 2025-11-28 23:39:16.259100 |
+| benchbasedb   | item                           | TABLE       |     100000 |       135.0 |          12.87 |         0.00 |        0.00 | 2025-11-28 23:30:21.428806 |
+| benchbasedb   | new_order                      | TABLE       |    4005000 |        60.0 |         229.17 |        19.63 |       20.18 | 2025-11-28 23:39:45.368711 |
+| benchbasedb   | new_order                      | TABLE       |   35991000 |        60.0 |        2059.42 |         6.54 |        6.73 | 2025-11-28 23:39:45.592697 |
+| benchbasedb   | new_order                      | TABLE       |    3996000 |        60.0 |         228.65 |        39.26 |       40.36 | 2025-11-28 23:39:45.368711 |
+| benchbasedb   | oorder                         | TABLE       |  119970000 |       154.0 |       17619.50 |       853.86 |      853.86 | 2025-11-28 23:39:39.394923 |
+| benchbasedb   | oorder                         | TABLE       |   13320000 |       154.0 |        1956.25 |      5123.15 |     5123.15 | 2025-11-28 23:39:39.291606 |
+| benchbasedb   | oorder                         | TABLE       |   13350000 |       154.0 |        1960.66 |      2561.57 |     2561.57 | 2025-11-28 23:39:39.291606 |
+| benchbasedb   | order_line                     | TABLE       |  133500440 |       205.0 |       26099.77 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       |  133196290 |       205.0 |       26040.31 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       | 1199678863 |       205.0 |      234541.10 |     55672.71 |    55672.71 | 2025-11-28 23:44:50.510581 |
+| benchbasedb   | order_line                     | TABLE       |  133495716 |       205.0 |       26098.84 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       |  133497638 |       205.0 |       26099.22 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       |  133199883 |       205.0 |       26041.01 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       |  133195668 |       205.0 |       26040.18 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       |  133199702 |       205.0 |       26040.97 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       |  133193370 |       205.0 |       26039.73 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | order_line                     | TABLE       |  133200156 |       205.0 |       26041.06 |     55672.71 |    55672.71 | 2025-11-28 23:44:49.977662 |
+| benchbasedb   | stock                          | TABLE       |   44500000 |       515.0 |       21855.83 |    521391.43 |   521391.43 | 2025-11-28 23:36:01.818981 |
+| benchbasedb   | stock                          | TABLE       |   44400000 |       515.0 |       21806.72 |   1042782.85 |  1042782.85 | 2025-11-28 23:36:01.818981 |
+| benchbasedb   | stock                          | TABLE       |  399900000 |       515.0 |      196407.79 |    173797.14 |   173797.14 | 2025-11-28 23:36:02.800845 |
+| benchbasedb   | warehouse                      | TABLE       |       3999 |       188.0 |           0.72 |         0.00 |        0.00 | 2025-11-29 00:27:38.228856 |
+| benchbasedb   | warehouse                      | TABLE       |        445 |       188.0 |           0.08 |         0.00 |        0.00 | 2025-11-29 00:27:38.216388 |
+| benchbasedb   | warehouse                      | TABLE       |        444 |       188.0 |           0.08 |         0.00 |        0.00 | 2025-11-29 00:27:38.216388 |
+| benchbasedb   | __idx_500463_idx_customer_name | INDEX       |       NULL |        NULL |           NULL |      4924.95 |     4924.95 | NULL                       |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   12096589 |        80.0 |         922.90 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   14707897 |        80.0 |        1122.12 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   12216211 |        80.0 |         932.02 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   14908644 |        80.0 |        1137.44 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   15508918 |        80.0 |        1183.24 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   16981189 |        80.0 |        1295.56 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   16742421 |        80.0 |        1277.35 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   13627095 |        80.0 |        1039.66 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |   10469541 |        80.0 |         798.76 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
+| benchbasedb   | __idx_500486_o_w_id            | INDEX       |  127258505 |        80.0 |        9709.05 |       691.65 |      691.65 | 2025-11-28 22:07:18.933909 |
++---------------+--------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+43 rows in set (0.14 sec)
+
+[benchbasedb] 20:07:47>
 
 
 
