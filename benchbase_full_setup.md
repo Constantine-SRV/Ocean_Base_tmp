@@ -117,6 +117,20 @@ tar -xzf target/benchbase-mysql.tgz -C ~/
 tar -xzf target/benchbase-mysql.tgz -C ~/
 ```
 
+### oracle
+```bash
+# 1. Клонируем исходники в отдельный каталог для профиля oracle
+git clone --depth 1 https://github.com/cmu-db/benchbase.git benchbase-oracle-src
+cd benchbase-oracle-src
+
+# 2. Сборка BenchBase c профилем oracle
+./mvnw clean package -P oracle -DskipTests
+
+# 3. Распаковка готовой сборки в домашний каталог
+tar -xzf target/benchbase-oracle.tgz -C ~/
+```
+
+
 После установки структура будет такой:
 ```bash
 ~/benchbase-postgres-src/   ← исходники (можно удалить)
