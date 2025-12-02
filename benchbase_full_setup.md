@@ -524,3 +524,184 @@ ORDER BY  1,2;
 3 rows in set (0.00 sec)
 
 ```
+
+twitter 80K
+ОБ
+```sql
+
+SELECT      svr_ip,     ROUND(DATA_DISK_CAPACITY / 1024 / 1024 / 1024, 2) as capacity_gb,     ROUND(DATA_DISK_IN_USE / 1024 / 1024 / 1024, 2) as in_use_gb,     ROUND((DATA_DISK_CAPACITY - DATA_DISK_IN_USE) / 1024 / 1024 / 1024, 2) as free_gb,     ROUND(DATA_DISK_IN_USE / DATA_DISK_CAPACITY * 100, 2) as used_pct FROM oceanbase.GV$OB_SERVERS;
++----------------+-------------+-----------+---------+----------+
+| svr_ip         | capacity_gb | in_use_gb | free_gb | used_pct |
++----------------+-------------+-----------+---------+----------+
+| 192.168.32.158 |      350.00 |    116.29 |  233.71 |    33.23 |
+| 192.168.32.159 |      350.00 |    116.46 |  233.54 |    33.28 |
+| 192.168.32.160 |      350.00 |    116.47 |  233.53 |    33.28 |
++----------------+-------------+-----------+---------+----------+
+3 rows in set (0.00 sec)
+
+[oceanbase] 08:02:45>
+
+
+SELECT     t.table_name,     COALESCE(s.row_count, 0) AS row_count,     CONCAT(ROUND(s.data_size / 1024 / 1024, 2), ' MB') AS total_size FROM information_schema.tables AS t LEFT JOIN (     SELECT         table_name,         SUM(  data_length + index_length) AS data_size,         SUM(table_rows) AS row_count     FROM information_schema.tables     WHERE table_schema = DATABASE()     GROUP BY table_name ) AS s ON s.table_name = t.table_name WHERE t.table_schema = DATABASE() ORDER
+    -> BY t.table_name;
++---------------+------------+--------------+
+| table_name    | row_count  | total_size   |
++---------------+------------+--------------+
+| added_tweets  |          0 | 0.00 MB      |
+| followers     |  122605619 | 498.00 MB    |
+| follows       |  122605619 | 324.00 MB    |
+| tweets        | 1600000000 | 113588.00 MB |
+| user_profiles |   40000000 | 1386.00 MB   |
++---------------+------------+--------------+
+5 rows in set (0.01 sec)
+
+[twitterdb] 08:02:16>
+
+
+
+
+ SELECT
+    ->     d.database_name,
+    ->     t.table_name,
+    ->     CASE t.table_type
+    ->         WHEN 3 THEN 'TABLE'
+    ->         WHEN 5 THEN 'INDEX'
+    ->         ELSE CONCAT('TYPE_', t.table_type)
+    ->     END AS object_type,
+    ->     ts.row_cnt AS total_rows,
+    ->     ROUND(ts.avg_row_len, 1) AS avg_row_len,
+    ->     ROUND(ts.row_cnt * ts.avg_row_len / 1024 / 1024, 2) AS approx_data_mb,
+    ->     ROUND(SUM(r.data_size) / 1024 / 1024, 2) AS real_data_mb,
+    ->     ROUND(SUM(r.required_size) / 1024 / 1024, 2) AS required_mb,
+    ->     MAX(ts.last_analyzed) AS last_analyzed
+    -> FROM oceanbase.__all_table t
+    -> JOIN oceanbase.__all_database d
+    ->     ON t.database_id = d.database_id
+    -> LEFT JOIN oceanbase.__all_table_stat ts
+    ->     ON ts.table_id = t.table_id
+    -> JOIN oceanbase.__all_tablet_to_ls ttl
+    ->     ON t.table_id = ttl.table_id
+    -> JOIN oceanbase.dba_ob_tablet_replicas r
+    ->     ON ttl.tablet_id = r.tablet_id
+    -> WHERE d.database_name ='twitterdb'
+    -> -- NOT IN ('oceanbase','mysql','information_schema','sys','ocs','sys_external_tbs')
+    -> GROUP BY d.database_name, t.table_name, t.table_type, ts.row_cnt, ts.avg_row_len, ts.last_analyzed
+    -> ORDER BY  1,2;
++---------------+-----------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+| database_name | table_name                        | object_type | total_rows | avg_row_len | approx_data_mb | real_data_mb | required_mb | last_analyzed              |
++---------------+-----------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+| twitterdb     | added_tweets                      | TABLE       |          0 |         0.0 |           0.00 |         0.00 |        0.00 | 2025-12-02 12:50:06.257790 |
+| twitterdb     | added_tweets                      | TABLE       |          0 |         0.0 |           0.00 |         0.00 |        0.00 | 2025-12-02 12:50:06.274475 |
+| twitterdb     | followers                         | TABLE       |   12077835 |        40.0 |         460.73 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |  122605619 |        40.0 |        4677.03 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.861560 |
+| twitterdb     | followers                         | TABLE       |    7493713 |        40.0 |         285.86 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |   32962379 |        40.0 |        1257.41 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |   18790363 |        40.0 |         716.80 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |   15072355 |        40.0 |         574.96 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |   10400605 |        40.0 |         396.75 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |    9313968 |        40.0 |         355.30 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |    8541792 |        40.0 |         325.84 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | followers                         | TABLE       |    7952609 |        40.0 |         303.37 |      1436.58 |     1436.58 | 2025-12-02 12:45:23.713088 |
+| twitterdb     | follows                           | TABLE       |   13655183 |        40.0 |         520.90 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |  122605619 |        40.0 |        4677.03 |       923.88 |      923.88 | 2025-12-02 12:45:26.764578 |
+| twitterdb     | follows                           | TABLE       |   13708338 |        40.0 |         522.93 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |   13568100 |        40.0 |         517.58 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |   13597631 |        40.0 |         518.71 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |   13664833 |        40.0 |         521.27 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |   13619717 |        40.0 |         519.55 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |   13662285 |        40.0 |         521.17 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |   13593986 |        40.0 |         518.57 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | follows                           | TABLE       |   13535546 |        40.0 |         516.34 |       923.88 |      923.88 | 2025-12-02 12:45:26.262883 |
+| twitterdb     | tweets                            | TABLE       | 1600000000 |       122.0 |      186157.23 |    299037.28 |   299037.28 | 2025-12-02 12:50:06.157124 |
+| twitterdb     | tweets                            | TABLE       |  154248857 |       122.0 |       17946.59 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  227293066 |       122.0 |       26445.15 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  152733503 |       122.0 |       17770.28 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  150919000 |       122.0 |       17559.16 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  249236383 |       122.0 |       28998.22 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  153190503 |       122.0 |       17823.45 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  154689718 |       122.0 |       17997.88 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  204770627 |       122.0 |       23824.71 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | tweets                            | TABLE       |  152918343 |       122.0 |       17791.78 |    299037.28 |   299037.28 | 2025-12-02 12:50:04.957877 |
+| twitterdb     | user_profiles                     | TABLE       |    4444444 |        78.0 |         330.61 |      8942.60 |     8942.60 | 2025-12-02 12:45:18.390601 |
+| twitterdb     | user_profiles                     | TABLE       |   40000000 |        78.0 |        2975.46 |      1788.52 |     1788.52 | 2025-12-02 12:45:18.434093 |
+| twitterdb     | user_profiles                     | TABLE       |    4444445 |        78.0 |         330.61 |      7154.08 |     7154.08 | 2025-12-02 12:45:18.390601 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |   37733270 |        20.0 |         719.71 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    4444444 |        20.0 |          84.77 |       508.38 |      508.38 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    4606825 |        20.0 |          87.87 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    3279392 |        20.0 |          62.55 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    4444445 |        20.0 |          84.77 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    4680287 |        20.0 |          89.27 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    4718354 |        20.0 |          90.00 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    3558572 |        20.0 |          67.87 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_followers   | INDEX       |    3556507 |        20.0 |          67.83 |       254.19 |      254.19 | 2025-12-02 03:44:59.819387 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    3558572 |        20.0 |          67.87 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    4444444 |        20.0 |          84.77 |       508.38 |      508.38 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    4606825 |        20.0 |          87.87 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    3279392 |        20.0 |          62.55 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    4444445 |        20.0 |          84.77 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    4680287 |        20.0 |          89.27 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    4718354 |        20.0 |          90.00 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |    3556507 |        20.0 |          67.83 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501181_idx_user_partition   | INDEX       |   37733270 |        20.0 |         719.71 |       254.19 |      254.19 | 2025-12-02 03:44:59.903186 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |   72536903 |        40.0 |        2767.06 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |   61675411 |        40.0 |        2352.73 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |   91920999 |        40.0 |        3506.51 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |   74915684 |        40.0 |        2857.81 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |   55862730 |        40.0 |        2130.99 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |  101319598 |        40.0 |        3865.04 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |   69345875 |        40.0 |        2645.34 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |  103567988 |        40.0 |        3950.81 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |   57738802 |        40.0 |        2202.56 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501235_idx_tweets_uid       | INDEX       |  688883990 |        40.0 |       26278.84 |     39145.50 |    39145.50 | 2025-12-02 04:30:19.348702 |
+| twitterdb     | __idx_501256_idx_added_tweets_uid | INDEX       |       NULL |        NULL |           NULL |         0.00 |        0.00 | NULL                       |
++---------------+-----------------------------------+-------------+------------+-------------+----------------+--------------+-------------+----------------------------+
+64 rows in set (0.11 sec)
+
+[twitterdb] 08:00:45>
+
+
+
+
+
+[twitterdb] 07:50:06> SELECT     t.table_name,     COALESCE(s.row_count, 0) AS row_count,     CONCAT(ROUND(s.data_size / 1024 / 1024, 2), ' MB') AS total_size FROM information_schema.tables AS t LEFT JOIN (     SELECT         table_name,         SUM(  data_length + index_length) AS data_size,         SUM(table_rows) AS row_count     FROM information_schema.tables     WHERE table_schema = DATABASE()     GROUP BY table_name ) AS s ON s.table_name = t.table_name WHERE t.table_schema = DATABASE() ORDER
+    -> BY t.table_name;
++---------------+------------+--------------+
+| table_name    | row_count  | total_size   |
++---------------+------------+--------------+
+| added_tweets  |          0 | 0.00 MB      |
+| followers     |  122605619 | 498.00 MB    |
+| follows       |  122605619 | 324.00 MB    |
+| tweets        | 1600000000 | 113588.00 MB |
+| user_profiles |   40000000 | 1386.00 MB   |
++---------------+------------+--------------+
+5 rows in set (0.13 sec)
+```
+
+PG
+```sql
+
+
+twitterdb=# SELECT
+    table_name,
+    (xpath('/row/count/text()', xml_count))[1]::text::bigint AS row_count,
+    pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) AS total_size
+FROM (
+    SELECT
+        table_name,
+        query_to_xml(format('SELECT count(*) AS count FROM %I', table_name), false, true, '') AS xml_count
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+) AS counts
+ORDER BY table_name;
+  table_name   | row_count  | total_size
+---------------+------------+------------
+ added_tweets  |          0 | 16 kB
+ followers     |  122828101 | 7266 MB
+ follows       |  122828101 | 7563 MB
+ tweets        | 1600000000 | 356 GB
+ user_profiles |   40000000 | 4966 MB
+(5 rows)
+
+twitterdb=# VACUUM (FREEZE, ANALYZE);
+
+```
