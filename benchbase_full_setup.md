@@ -264,8 +264,7 @@ java -Xms2G -Xmx4G -jar benchbase.jar -b chbenchmark -c ~/benchbase-configs/ocea
 ```
 ## Запросы по размерам таблиц
 ### 100 складов ПГ
-```
-
+```sql
 benchbasedb=# VACUUM (FREEZE, ANALYZE);
 VACUUM
 benchbasedb=# SELECT
@@ -325,7 +324,7 @@ benchbasedb=#
 
 ```
 ### 100 складов ОБ
-```
+```sql
 [benchbasedb] 09:09:28> CALL analyze_all_tables();
 Query OK, 0 rows affected (43.27 sec)
 
@@ -400,7 +399,7 @@ ORDER BY  1,2;
 ```
 
 ### 4000 складов ОБ
-```
+```sql
  SELECT     t.table_name,     CASE t.table_type         WHEN 3 THEN 'TABLE'         WHEN 5 THEN 'INDEX'     END as object_type,     COUNT(DISTINCT r.TABLET_ID) as tablet_count,     ROUND(SUM(r.DATA_SIZE) / 1024 / 1024, 2) as data_mb,     ROUND(SUM(r.REQUIRED_SIZE) / 1024 / 1024, 2) as required_mb FROM oceanbase.__all_table t JOIN oceanbase.__all_tablet_to_ls ttl ON t.table_id = ttl.table_id JOIN oceanbase.DBA_OB_TABLET_REPLICAS r ON ttl.tablet_id = r.TABLET_ID WHERE t.database_id = (     SELECT database_id FROM oceanbase.__all_database WHERE database_name = 'benchbasedb' ) GROUP BY t.table_name, t.table_type ORDER BY data_mb DESC;
 +--------------------------------+-------------+--------------+-----------+-------------+
 | table_name                     | object_type | tablet_count | data_mb   | required_mb |
@@ -525,7 +524,7 @@ ORDER BY  1,2;
 
 ```
 
-twitter 80K
+## twitter 80K
 ОБ
 ```sql
 
