@@ -119,8 +119,8 @@ tar -xzf target/benchbase-mysql.tgz -C ~/
 
 ### oracle
 ```bash
-# 1. Клонируем исходники в отдельный каталог для профиля oracle
-git clone --depth 1 https://github.com/cmu-db/benchbase.git benchbase-oracle-src
+# 1. Клонируем исходники в отдельный каталог для профиля oracle bcghfdkty Q15 игнорирование ошибки при создании удалении вьюшки
+git clone --depth 1 https://github.com/Constantine-SRV/benchbase.git benchbase-oracle-src
 cd benchbase-oracle-src
 
 # 2. Сборка BenchBase c профилем oracle
