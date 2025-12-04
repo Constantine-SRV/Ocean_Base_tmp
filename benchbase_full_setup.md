@@ -135,7 +135,7 @@ cd benchbase-mssql-src
 git remote -v
 ./mvnw clean package -P sqlserver -DskipTests
 tar -xzf target/benchbase-sqlserver.tgz -C ~/
-cd ~/benchbase-mssql/
+cd ~/benchbase-sqlserver/
 ```
 
 
