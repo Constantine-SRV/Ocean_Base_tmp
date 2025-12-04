@@ -119,16 +119,24 @@ tar -xzf target/benchbase-mysql.tgz -C ~/
 
 ### oracle
 ```bash
-# 1. Клонируем исходники в отдельный каталог для профиля oracle bcghfdkty Q15 игнорирование ошибки при создании удалении вьюшки
+
 git clone --depth 1 https://github.com/Constantine-SRV/benchbase.git benchbase-oracle-src
 cd benchbase-oracle-src
-
-# 2. Сборка BenchBase c профилем oracle
+git remote -v
 ./mvnw clean package -P oracle -DskipTests
-
-# 3. Распаковка готовой сборки в домашний каталог
 tar -xzf target/benchbase-oracle.tgz -C ~/
 ```
+
+### MSSQL
+```bash
+
+git clone --depth 1 https://github.com/Constantine-SRV/benchbase.git benchbase-mssql-src
+cd benchbase-mssql-src
+git remote -v
+./mvnw clean package -P mssql -DskipTests
+tar -xzf target/benchbase-mssql.tgz -C ~/
+```
+
 
 
 После установки структура будет такой:
