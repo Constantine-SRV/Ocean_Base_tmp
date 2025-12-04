@@ -129,7 +129,7 @@ tar -xzf target/benchbase-oracle.tgz -C ~/
 
 ### MSSQL
 ```bash
-
+cd ~
 git clone --depth 1 https://github.com/Constantine-SRV/benchbase.git benchbase-mssql-src
 cd benchbase-mssql-src
 git remote -v
