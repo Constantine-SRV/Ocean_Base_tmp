@@ -133,8 +133,9 @@ tar -xzf target/benchbase-oracle.tgz -C ~/
 git clone --depth 1 https://github.com/Constantine-SRV/benchbase.git benchbase-mssql-src
 cd benchbase-mssql-src
 git remote -v
-./mvnw clean package -P mssql -DskipTests
-tar -xzf target/benchbase-mssql.tgz -C ~/
+./mvnw clean package -P sqlserver -DskipTests
+tar -xzf target/benchbase-sqlserver.tgz -C ~/
+cd ~/benchbase-mssql/
 ```
 
 
