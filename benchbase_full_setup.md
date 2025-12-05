@@ -109,7 +109,7 @@ git remote -v
 
 # Распаковка готовой сборки в домашний каталог
 tar -xzf target/benchbase-mysql.tgz -C ~/
-
+cd ~/benchbase-mysql/
 ```
 
 ```bash
@@ -137,6 +137,13 @@ git remote -v
 ./mvnw clean package -P sqlserver -DskipTests
 tar -xzf target/benchbase-sqlserver.tgz -C ~/
 cd ~/benchbase-sqlserver/
+```
+копирование конфигов по умолчанию
+```bash
+cp ~/benchbase-mysql/config/postgres/sample_tpcc_config.xml ~/benchbase-configs/postgres/pg_ch_10w.xml
+
+cp ~/benchbase-mysql/config/mysql/sample_auctionmark_config.xml ~/benchbase-configs/
+
 ```
 
 
