@@ -142,7 +142,9 @@ cd ~/benchbase-sqlserver/
 ```bash
 cp ~/benchbase-mysql/config/postgres/sample_tpcc_config.xml ~/benchbase-configs/postgres/pg_ch_10w.xml
 
-cp ~/benchbase-mysql/config/mysql/sample_auctionmark_config.xml ~/benchbase-configs/
+cp ~/benchbase-mysql/config/mysql/sample_auctionmark_config.xml ~/benchbase-configs/oceanbase/
+cp ~/benchbase-mysql/config/mysql/sample_auctionmark_config.xml ~/benchbase-configs/postgres/
+
 
 ```
 
