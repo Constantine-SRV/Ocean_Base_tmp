@@ -237,9 +237,8 @@ WHERE DATABASE_NAME = DATABASE();
 [tpchdb] 10:24:01>
 ```
 
+### в системном тенанте проверка
 ```sql
-
-в системном тенанте проверка
 
 [oceanbase] 12:41:20> SELECT      svr_ip,     ROUND(DATA_DISK_CAPACITY / 1024 / 1024 / 1024, 2) as capacity_gb,     ROUND(DATA_DISK_IN_USE / 1024 / 1024 / 1024, 2) as in_use_gb,     ROUND((DATA_DISK_CAPACITY - DATA_DISK_IN_USE) / 1024 / 1024 / 1024, 2) as free_gb,     ROUND(DATA_DISK_IN_USE / DATA_DISK_CAPACITY * 100, 2) as used_pct FROM oceanbase.GV$OB_SERVERS;
 +----------------+-------------+-----------+---------+----------+
