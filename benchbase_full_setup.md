@@ -119,7 +119,8 @@ tar -xzf target/benchbase-mysql.tgz -C ~/
 
 ### oracle
 ```bash
-
+cd ~
+rm -rf benchbase-oracle benchbase-oracle-src
 git clone --depth 1 https://github.com/Constantine-SRV/benchbase.git benchbase-oracle-src
 cd benchbase-oracle-src
 git remote -v
