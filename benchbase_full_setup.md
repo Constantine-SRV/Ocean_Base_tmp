@@ -126,6 +126,7 @@ cd benchbase-oracle-src
 git remote -v
 ./mvnw clean package -P oracle -DskipTests
 tar -xzf target/benchbase-oracle.tgz -C ~/
+cd ~/benchbase-oracle/
 ```
 
 ### MSSQL
