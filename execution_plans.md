@@ -77,3 +77,15 @@ LIMIT 20;
 
 
 ```
+
+```sql
+select last_trace_id();
+YB420A151A75-0006487E7B3B2FE5-0-0
+
+SELECT * FROM oceanbase.GV$OB_SQL_AUDIT
+WHERE tenant_id = (SELECT EFFECTIVE_TENANT_ID())
+and trace_id ='YB420A151A75-0006487E7B3B2FE5-0-0'
+  AND request_time > (time_to_usec(now()) - 300000000)  
+ORDER BY request_time DESC
+LIMIT 20;
+```
