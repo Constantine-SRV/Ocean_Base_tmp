@@ -54,3 +54,42 @@ ORDER BY t.table_name, r.svr_ip;
 30 rows in set (0.07 sec)
 
 ```
+## дополнительные запросы
+
+1. Распределение log stream лидеров по серверам/зонам
+```sql
+SELECT SVR_IP, ROLE, COUNT(*) AS ls_count 
+FROM GV$OB_LOG_STAT 
+GROUP BY SVR_IP, ROLE 
+ORDER BY SVR_IP;
+```
+3. Распределение tablet лидеров по зонам и серверам (ключевой запрос):
+```sql
+SELECT zone, svr_ip, role, COUNT(1) AS cnt 
+FROM DBA_OB_TABLE_LOCATIONS 
+GROUP BY zone, svr_ip, role 
+ORDER BY zone, role DESC;
+```
+4. Проверить количество tablet'ов на каждом сервере:
+```sql
+SELECT SVR_IP, COUNT(*) AS tablet_count 
+FROM DBA_OB_TABLET_REPLICAS 
+GROUP BY SVR_IP;
+```
+5. Посмотреть где находятся лидеры для конкретной таблицы (например warehouse):
+```sql
+SELECT table_name, zone, svr_ip, role, COUNT(*) AS cnt 
+FROM DBA_OB_TABLE_LOCATIONS 
+WHERE table_name = 'warehouse'
+GROUP BY table_name, zone, svr_ip, role;
+```
+6. Проверить статус units по зонам:
+```sql
+SELECT zone, svr_ip, tenant_id, status 
+FROM DBA_OB_UNITS 
+ORDER BY zone;
+```
+7. Проверить включен ли rebalance:
+```sql
+SHOW PARAMETERS LIKE '%enable_rebalance%';
+```
