@@ -1,5 +1,9 @@
 EXPLAIN EXTENDED select count(*) from lineitem;
 
+включить аудит
+SHOW PARAMETERS LIKE 'enable_sql_audit';
+ALTER SYSTEM SET enable_sql_audit = true;
+
 ### с данными о IO
 ```sql
 
@@ -91,7 +95,7 @@ LIMIT 20;
 ```
 
 ## получения нужного плана и что он использовал
-план уникален внутри сервера и тенанта так что их надо вводить
+план уникален внутри тенанта
 ```sql
 SELECT
   usec_to_time(a.request_time)                         AS ts,
@@ -131,6 +135,6 @@ LEFT JOIN oceanbase.GV$OB_PLAN_CACHE_PLAN_EXPLAIN p
  AND p.svr_port  = a.svr_port
 ORDER BY
   a.request_time DESC,
-  p.plan_line_id;
+  p.plan_line_id \G
 
 ```
