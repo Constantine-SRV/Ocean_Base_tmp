@@ -89,3 +89,48 @@ and trace_id ='YB420A151A75-0006487E7B3B2FE5-0-0'
 ORDER BY request_time DESC
 LIMIT 20;
 ```
+
+## получения нужного плана и что он использовал
+план уникален внутри сервера и тенанта так что их надо вводить
+```sql
+SELECT
+  usec_to_time(a.request_time)                         AS ts,
+  a.svr_ip, a.svr_port,
+  a.tenant_name, a.db_name, a.user_name,
+  a.client_ip, a.client_port,
+  a.sql_id, a.plan_id,
+  a.is_hit_plan,
+  a.elapsed_time, a.get_plan_time, a.execute_time, a.queue_time,
+  a.total_wait_time_micro, a.total_waits,
+  a.event, a.wait_class, a.state,
+  a.disk_reads,
+  a.memstore_read_row_count, a.ssstore_read_row_count,
+  a.return_rows, a.affected_rows,
+  a.table_scan, a.partition_cnt, a.partition_hit,
+  a.query_sql,
+
+  p.plan_line_id, p.plan_depth,
+  p.operator, p.name,
+  p.rows  AS plan_est_rows,
+  p.cost  AS plan_cost,
+  p.property
+FROM
+(
+  SELECT *
+  FROM oceanbase.GV$OB_SQL_AUDIT
+  WHERE tenant_name = 'app_tenant'
+    AND db_name = 'audit_test'
+    AND query_sql LIKE '%select * from t_audit1%'
+  ORDER BY request_time DESC
+  LIMIT 10
+) a
+LEFT JOIN oceanbase.GV$OB_PLAN_CACHE_PLAN_EXPLAIN p
+  ON p.tenant_id = a.tenant_id
+ AND p.plan_id   = a.plan_id
+ AND p.svr_ip    = a.svr_ip
+ AND p.svr_port  = a.svr_port
+ORDER BY
+  a.request_time DESC,
+  p.plan_line_id;
+
+```
