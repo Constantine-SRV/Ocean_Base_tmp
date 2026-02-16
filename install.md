@@ -225,3 +225,8 @@ obagent:
   depends:
   - oceanbase-ce
 ```
+
+### задать часовой пояс
+```sql
+SET GLOBAL time_zone = '+03:00';
+```
