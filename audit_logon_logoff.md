@@ -158,7 +158,7 @@ TIMESTAMP|TENANT_ID|SESSION_ID
 ```
 
 # Прокси
-## через проксивсе логины и успешные и нет
+## через прокси все логины и успешные и нет
 ``` bash
 MINUTES=60
 LOG_DIR="/data/obc1/obproxy/log"
