@@ -285,3 +285,17 @@ awk -v since="${SINCE}" '
 TIMESTAMP|CLIENT_IP|TENANT|USER|CLUSTER|CS_ID|PROXY_SESSID
 2026-03-07 11:56:29.777692|192.168.73.31:49494|app_tenant|ta|obc1|22|13882407183691481105
 ```
+
+
+### найти пути
+```
+readlink -f /proc/$(pgrep -f "bin/obproxy")/cwd
+/data/obc1/obproxy
+
+```
+
+```
+readlink -f /proc/$(pgrep -f "bin/observer")/cwd
+/data/obc1/oceanbase
+
+```
