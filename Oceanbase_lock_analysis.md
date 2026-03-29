@@ -1,7 +1,7 @@
 # OceanBase CE — Анализ блокировок (Lock Tree)
 
 **Версия:** OceanBase CE 4.4.1  
-**Тестовый прокси:** 192.168.55.200:2883  
+**Тестовый прокси:** Oceanbase lock analysis:2883  
 **Тенант:** app_tenant  
 
 ---
@@ -11,7 +11,7 @@
 ### 1.1 Подключение и создание БД, таблицы, пользователей
 
 ```bash
-MYSQL_PS1="[root][\d] \R:\m:\s> " mysql -h192.168.55.200 -P2883 -uroot@app_tenant -p'qaz123' \
+MYSQL_PS1="[root][\d] \R:\m:\s> " mysql -h192.168.73.200 -P2883 -uroot@app_tenant -p'qaz123' \
   -A --init-command="SET SESSION ob_query_timeout=10000000000; SET SESSION ob_trx_timeout=10000000000"
 ```
 
@@ -54,35 +54,35 @@ SELECT * FROM accounts;
 
 **Терминал 1 — usr1**
 ```bash
-MYSQL_PS1="[T1-usr1][\d] \R:\m:\s> " mysql -h192.168.55.200 -P2883 \
+MYSQL_PS1="[T1-usr1][\d] \R:\m:\s> " mysql -h192.168.73.200 -P2883 \
   -uusr1@app_tenant -p'qaz123' -A -D locktest \
   --init-command="SET SESSION ob_query_timeout=10000000000; SET SESSION ob_trx_timeout=10000000000"
 ```
 
 **Терминал 2 — usr2**
 ```bash
-MYSQL_PS1="[T2-usr2][\d] \R:\m:\s> " mysql -h192.168.55.200 -P2883 \
+MYSQL_PS1="[T2-usr2][\d] \R:\m:\s> " mysql -h192.168.73.200 -P2883 \
   -uusr2@app_tenant -p'qaz123' -A -D locktest \
   --init-command="SET SESSION ob_query_timeout=10000000000; SET SESSION ob_trx_timeout=10000000000"
 ```
 
 **Терминал 3 — usr3**
 ```bash
-MYSQL_PS1="[T3-usr3][\d] \R:\m:\s> " mysql -h192.168.55.200 -P2883 \
+MYSQL_PS1="[T3-usr3][\d] \R:\m:\s> " mysql -h192.168.73.200 -P2883 \
   -uusr3@app_tenant -p'qaz123' -A -D locktest \
   --init-command="SET SESSION ob_query_timeout=10000000000; SET SESSION ob_trx_timeout=10000000000"
 ```
 
 **Терминал 4 — usr4**
 ```bash
-MYSQL_PS1="[T4-usr4][\d] \R:\m:\s> " mysql -h192.168.55.200 -P2883 \
+MYSQL_PS1="[T4-usr4][\d] \R:\m:\s> " mysql -h192.168.73.200 -P2883 \
   -uusr4@app_tenant -p'qaz123' -A -D locktest \
   --init-command="SET SESSION ob_query_timeout=10000000000; SET SESSION ob_trx_timeout=10000000000"
 ```
 
 **Терминал 5 — root@sys (наблюдатель)**
 ```bash
-MYSQL_PS1="[T5-root][\d] \R:\m:\s> " mysql -h192.168.55.200 -P2883 \
+MYSQL_PS1="[T5-root][\d] \R:\m:\s> " mysql -h192.168.73.200 -P2883 \
   -uroot@sys -p'qaz123' -A -D oceanbase \
   --init-command="SET SESSION ob_query_timeout=10000000000"
 ```
@@ -290,10 +290,10 @@ ORDER BY lc.root_trans_id, lc.depth;
 +-------+----------------------------------------------+------------+---------+---------------------+----------+----------+----------------------------------------------------------+------------+
 | depth | chain                                        | session_id | db_user | client_ip           | hold_sec | wait_sec | sql_text                                                 | sql_source |
 +-------+----------------------------------------------+------------+---------+---------------------+----------+----------+----------------------------------------------------------+------------+
-|     0 | 40895864                                     | 3221502420 | usr1    | 192.168.55.31:51544 |    371.4 |     NULL | UPDATE accounts SET balance = balance - 100 WHERE id = 1 | last       |
-|     1 | 40895864 -> 40895925                         | 3221503628 | usr2    | 192.168.55.31:43000 |    354.5 |    353.6 | UPDATE accounts SET balance = balance + 50 WHERE id = 1  | current    |
-|     2 | 40895864 -> 40895925 -> 40895991             | 3221504757 | usr3    | 192.168.55.31:41472 |    336.6 |    336.0 | UPDATE accounts SET balance = balance * 1.1 WHERE id = 2 | current    |
-|     3 | 40895864 -> 40895925 -> 40895991 -> 40896051 | 3221506054 | usr4    | 192.168.55.31:49306 |    319.1 |    317.9 | UPDATE accounts SET balance = 9999 WHERE id = 3          | current    |
+|     0 | 40895864                                     | 3221502420 | usr1    | 192.168.73.31:51544 |    371.4 |     NULL | UPDATE accounts SET balance = balance - 100 WHERE id = 1 | last       |
+|     1 | 40895864 -> 40895925                         | 3221503628 | usr2    | 192.168.73.31:43000 |    354.5 |    353.6 | UPDATE accounts SET balance = balance + 50 WHERE id = 1  | current    |
+|     2 | 40895864 -> 40895925 -> 40895991             | 3221504757 | usr3    | 192.168.73.31:41472 |    336.6 |    336.0 | UPDATE accounts SET balance = balance * 1.1 WHERE id = 2 | current    |
+|     3 | 40895864 -> 40895925 -> 40895991 -> 40896051 | 3221506054 | usr4    | 192.168.73.31:49306 |    319.1 |    317.9 | UPDATE accounts SET balance = 9999 WHERE id = 3          | current    |
 +-------+----------------------------------------------+------------+---------+---------------------+----------+----------+----------------------------------------------------------+------------+
 ```
 
