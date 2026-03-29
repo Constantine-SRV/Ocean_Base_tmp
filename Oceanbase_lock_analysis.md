@@ -1,9 +1,5 @@
 # OceanBase CE — Анализ блокировок (Lock Tree)
 
-**Версия:** OceanBase CE 4.4.1  
-**Тестовый прокси:** Oceanbase lock analysis:2883  
-**Тенант:** app_tenant  
-
 ---
 
 ## 1. Создание демостенда
