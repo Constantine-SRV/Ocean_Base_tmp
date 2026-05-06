@@ -243,3 +243,49 @@ SHOW PARAMETERS LIKE '%log_disk%';
 6. Если не помогает → ALTER RESOURCE UNIT ... LOG_DISK_SIZE = '...'
 7. Вернуть threshold на 80
 ```
+## мониторинг 
+
+```sql
+SELECT
+   a.tenant_name,
+   u.svr_ip,
+   ROUND(u.log_disk_size/1024/1024/1024, 1)                         AS allocated_GB,
+   ROUND(SUM(ls.END_LSN - ls.BASE_LSN)/1024/1024/1024, 1)          AS active_GB,
+   ROUND(SUM(ls.BASE_LSN - ls.BEGIN_LSN)/1024/1024/1024, 1)        AS recyclable_GB,
+   ROUND((u.log_disk_size
+          - SUM(ls.END_LSN - ls.BASE_LSN))/1024/1024/1024, 1)      AS effective_free_GB,
+   ROUND(u.log_disk_size * 0.95/1024/1024/1024, 1)                 AS kill_limit_GB,
+   ROUND((u.log_disk_size * 0.95
+          - SUM(ls.END_LSN - ls.BASE_LSN))/1024/1024/1024, 1)      AS headroom_GB,
+   ROUND(SUM(ls.END_LSN - ls.BASE_LSN)
+         / (u.log_disk_size * 0.95) * 100, 1)                      AS pct_of_limit,
+   NOW()                                                             AS checked_at
+    FROM __all_virtual_unit u
+    JOIN dba_ob_tenants a ON u.tenant_id = a.tenant_id
+    JOIN oceanbase.GV$OB_LOG_STAT ls
+    ON u.tenant_id = ls.TENANT_ID
+   AND u.svr_ip    = ls.SVR_IP
+    WHERE u.svr_ip = (SELECT SVR_IP FROM oceanbase.GV$OB_LOG_STAT LIMIT 1)
+    GROUP BY a.tenant_name, u.svr_ip, u.log_disk_size
+    ORDER BY pct_of_limit DESC;
++-------------+----------------+--------------+-----------+---------------+-------------------+---------------+-------------+--------------+---------------------+
+| tenant_name | svr_ip         | allocated_GB | active_GB | recyclable_GB | effective_free_GB | kill_limit_GB | headroom_GB | pct_of_limit | checked_at          |
++-------------+----------------+--------------+-----------+---------------+-------------------+---------------+-------------+--------------+---------------------+
+| sys         | 192.168.5.205 |          2.0 |       0.3 |           1.2 |               1.7 |           1.9 |         1.6 |         16.1 | 2026-05-06 18:37:25 |
+| META$1002   | 192.168.5.205 |          2.0 |       0.1 |           1.4 |               1.9 |           1.9 |         1.8 |          5.9 | 2026-05-06 18:37:25 |
+| app_tenant  | 192.168.5.205 |         18.0 |       0.2 |          14.0 |              17.8 |          17.1 |        16.9 |          1.1 | 2026-05-06 18:37:25 |
++-------------+----------------+--------------+-----------+---------------+-------------------+---------------+-------------+--------------+---------------------+
+3 rows in set (0.02 sec)
+
+[rlm_sys|oceanbase] 15:37:25>
+```
+active_GBаналог "Log Used" в MSSQL — реально нельзя удалить
+
+recyclable_GBбудет перезаписан, считай свободным
+
+effective_free_GB сколько реально осталось для роста
+
+headroom_GB сколько осталось до Transaction is killed
+
+pct_of_limitглавная метрика — при 90%+ начинай действовать
+
