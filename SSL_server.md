@@ -93,7 +93,7 @@ certutil -encode ca.cer ca.pem
 
 ## Шаг 5: Конвертация .cer → .pem и проверка (на сервере OceanBase)
 
-Из веб-интерфейса AD CS (`https://dc1.p4.com/certsrv/`) при выборе
+Из веб-интерфейса AD CS (`https://доменконтроллер/certsrv/`) при выборе
 **Base 64 encoded** скачиваются файлы `.cer`, которые **уже являются PEM**
 (внутри `-----BEGIN CERTIFICATE-----`). Нужен только round-trip через
 `openssl x509`: он убирает Windows-окончания строк (CRLF), отрезает лишнее
