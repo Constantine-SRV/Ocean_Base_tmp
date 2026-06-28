@@ -65,6 +65,7 @@ openssl req -new -key server-key.pem -out server.csr -config server-ssl.cnf
 # Проверить CSR (убедись что CN и SAN правильные)
 openssl req -in server.csr -text -noout | grep -A1 "Subject:"
 openssl req -in server.csr -text -noout | grep -A2 "Subject Alternative Name"
+openssl req -in server.csr -text -noout | grep -A2 "Extended Key Usage"
 ```
 
 ## Шаг 3: Подписание на Microsoft AD CA
