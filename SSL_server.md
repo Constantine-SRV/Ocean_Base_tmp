@@ -132,6 +132,16 @@ openssl x509 -in server-cert.pem -noout -ext subjectAltName
 # 4) Срок действия и Subject
 openssl x509 -in server-cert.pem -noout -subject -dates
 ```
+еще проверка
+```bash
+[admin@obsrv202 cert]$ openssl x509 -in server-cert.pem -noout -ext extendedKeyUsage
+X509v3 Extended Key Usage:
+    TLS Web Client Authentication, TLS Web Server Authentication
+[admin@obsrv202 cert]$ openssl x509 -in server-cert.pem -noout -ext keyUsage
+X509v3 Key Usage: critical
+    Digital Signature, Key Encipherment
+[admin@obsrv202 cert]$
+```
 
 После этого в `~/cert` лежат три готовых файла: `ca.pem`,
 `server-cert.pem`, `server-key.pem` — переходи к копированию в wallet.
