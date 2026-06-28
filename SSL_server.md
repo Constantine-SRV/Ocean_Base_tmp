@@ -40,21 +40,12 @@ IP.5 = 192.168.55.205
 EOF
 
 
-# Приватный ключ (RSA 2048)
-openssl genrsa -out server-key.pem 2048
-
-# Запрос на сертификат (CSR)
-openssl req -new -key server-key.pem -out server.csr -config server-ssl.cnf
-
-# Проверить CSR (убедись что CN и SAN правильные)
-openssl req -in server.csr -text -noout | grep -A1 "Subject:"
-openssl req -in server.csr -text -noout | grep -A2 "Subject Alternative Name"
 ```
 
 ## Шаг 2: Генерация приватного ключа и CSR
 
 ```bash
-cd /tmp
+cd /cert
 
 # Приватный ключ (RSA 2048)
 openssl genrsa -out server-key.pem 2048
@@ -66,6 +57,7 @@ openssl req -new -key server-key.pem -out server.csr -config server-ssl.cnf
 openssl req -in server.csr -text -noout | grep -A1 "Subject:"
 openssl req -in server.csr -text -noout | grep -A2 "Subject Alternative Name"
 openssl req -in server.csr -text -noout | grep -A2 "Extended Key Usage"
+cat server.csr
 ```
 
 ## Шаг 3: Подписание на Microsoft AD CA
