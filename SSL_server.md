@@ -3,11 +3,9 @@
 ## Шаг 1: Создание конфигурации OpenSSL (на сервере OceanBase)
 
 ```bash
-# Замени значения на свои
-SERVER_FQDN="ob55206.domain.local"   # Реальное имя сервера для CN
-SERVER_IP="192.168.55.206"            # IP адрес сервера
+cd cert
 
-cat > /tmp/server-ssl.cnf << EOF
+cat > server-ssl.cnf << EOF
 [req]
 default_bits = 2048
 prompt = no
@@ -16,18 +14,41 @@ distinguished_name = dn
 req_extensions = req_ext
 
 [dn]
-CN = ${SERVER_FQDN}
-O = YourOrganization
+CN = obcluster200
+O = lab
 OU = Database
-C = RU
+C = SU
 
 [req_ext]
 subjectAltName = @alt_names
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth
+
 
 [alt_names]
-DNS.1 = ${SERVER_FQDN}
-IP.1 = ${SERVER_IP}
+DNS.1 = OBM55200
+IP.1 = 192.168.55.200
+DNS.2 = obsrv201
+IP.2 = 192.168.55.201
+DNS.3 = obsrv202
+IP.3 = 192.168.55.202
+DNS.4 = obsrv203
+IP.4 = 192.168.55.203
+DNS.5 = OB55205
+IP.5 = 192.168.55.205
+
 EOF
+
+
+# Приватный ключ (RSA 2048)
+openssl genrsa -out server-key.pem 2048
+
+# Запрос на сертификат (CSR)
+openssl req -new -key server-key.pem -out server.csr -config server-ssl.cnf
+
+# Проверить CSR (убедись что CN и SAN правильные)
+openssl req -in server.csr -text -noout | grep -A1 "Subject:"
+openssl req -in server.csr -text -noout | grep -A2 "Subject Alternative Name"
 ```
 
 ## Шаг 2: Генерация приватного ключа и CSR
