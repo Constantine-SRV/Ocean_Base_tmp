@@ -150,12 +150,14 @@ X509v3 Key Usage: critical
 
 ```bash
 # Путь к wallet (замени на свой)
+pgrep -a observer
+
 WALLET_DIR=/data/obc1/oceanbase/wallet
 
 # Копируй сертификаты
-sudo cp /tmp/ca.pem $WALLET_DIR/
-sudo cp /tmp/server-cert.pem $WALLET_DIR/
-sudo cp /tmp/server-key.pem $WALLET_DIR/
+sudo cp ./ca.pem $WALLET_DIR/
+sudo cp ./server-cert.pem $WALLET_DIR/
+sudo cp ./server-key.pem $WALLET_DIR/
 
 # Права доступа
 sudo chown admin:admin $WALLET_DIR/*.pem
