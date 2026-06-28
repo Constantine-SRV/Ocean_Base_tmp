@@ -91,14 +91,50 @@ certutil -encode ca.cer ca.pem
 
 Скачай с `https://ca-server/certsrv` → "Download a CA certificate"
 
-## Шаг 5: Копирование файлов на OceanBase сервер
+## Шаг 5: Конвертация .cer → .pem и проверка (на сервере OceanBase)
+
+Из веб-интерфейса AD CS (`https://dc1.p4.com/certsrv/`) при выборе
+**Base 64 encoded** скачиваются файлы `.cer`, которые **уже являются PEM**
+(внутри `-----BEGIN CERTIFICATE-----`). Нужен только round-trip через
+`openssl x509`: он убирает Windows-окончания строк (CRLF), отрезает лишнее
+и валидирует сертификат. Имена меняем на те, что ждёт OceanBase.
 
 ```bash
-# С машины где файлы, на сервер OceanBase
-scp /tmp/ca.pem admin@192.168.55.206:/tmp/
-scp /tmp/server-cert.pem admin@192.168.55.206:/tmp/
-scp /tmp/server-key.pem admin@192.168.55.206:/tmp/
+cd ~/cert
+
+# server-cert.cer -> server-cert.pem (fallback на DER, если скачал в DER)
+openssl x509 -in server-cert.cer -out server-cert.pem 2>/dev/null \
+  || openssl x509 -inform DER -in server-cert.cer -out server-cert.pem
+
+# ca.cer -> ca.pem
+openssl x509 -in ca.cer -out ca.pem 2>/dev/null \
+  || openssl x509 -inform DER -in ca.cer -out ca.pem
 ```
+
+### Обязательные проверки перед установкой
+
+```bash
+# 1) Ключ соответствует сертификату — обе md5 ДОЛЖНЫ совпасть.
+#    Если нет — AD CS подписал не тот CSR, observer не стартанёт.
+openssl x509 -in server-cert.pem -noout -modulus | openssl md5
+openssl rsa  -in server-key.pem  -noout -modulus | openssl md5
+
+# 2) Цепочка валидна (серт подписан этим CA)
+openssl verify -CAfile ca.pem server-cert.pem
+# Ожидается: server-cert.pem: OK
+
+# 3) SAN выжил в выписанном серте.
+#    Шаблон WebServer в AD CS по умолчанию SAN из запроса НЕ пробрасывает —
+#    нужен кастомный шаблон ("supply in request") или флаг CA
+#    EDITF_ATTRIBUTESUBJECTALTNAME2. Если вывод пустой — перевыписывай серт.
+openssl x509 -in server-cert.pem -noout -ext subjectAltName
+
+# 4) Срок действия и Subject
+openssl x509 -in server-cert.pem -noout -subject -dates
+```
+
+После этого в `~/cert` лежат три готовых файла: `ca.pem`,
+`server-cert.pem`, `server-key.pem` — переходи к копированию в wallet.
 
 ## Шаг 6: Установка в wallet (на сервере OceanBase)
 
