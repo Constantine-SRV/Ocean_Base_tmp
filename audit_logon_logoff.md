@@ -70,6 +70,16 @@ TIMESTAMP|CLIENT_IP|TENANT|USER|SESSION_ID|SSL|CLIENT|RESULT
 
 ```
 
+## вход со старым паролем
+```
+ grep -a "login via OLD password" /data/obc442/oceanbase/log/observer.log
+
+[2026-07-12 19:23:26.234989] INFO  [SHARE.SCHEMA] check_user_access (ob_schema_getter_guard_user.cpp:454) [17503][T1004_MysqlQueu][T1004][Y0-0000000000000000-0-0] [lt=8] login via OLD password (dual password fallback)(tenant_name=app_tenant, user_name=dp_test, client_ip=192.168.55.200, old_password_start_time=1783866110363635)
+[2026-07-12 19:24:37.743488] INFO  [SHARE.SCHEMA] check_user_access (ob_schema_getter_guard_user.cpp:454) [17503][T1004_MysqlQueu][T1004][Y0-0006566C70796325-0-0] [lt=17] login via OLD password (dual password fallback)(tenant_name=app_tenant, user_name=dp_test, client_ip=192.168.55.190, old_password_start_time=1783866110363635)
+[admin@obsrv202 ~]$
+
+```
+
 ## события логофф в отдельном выводе
 их очень много т.к. отфильтровать служебные нельхзя сопоставляются с первым выводом по SESSION_ID 
 ```bash
